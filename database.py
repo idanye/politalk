@@ -17,7 +17,15 @@ cursor.execute('''
     );
 ''')
 
-# /////
+new_user_data = ('Jane Doe', 'Mathematics', 1, 'Another University')
+cursor.execute('''
+    INSERT INTO UserEducation 
+    (Name,
+    Education, 
+    IsCurrentlyStudent, 
+    WhereCurrentlyStudent) 
+        VALUES (?, ?, ?, ?)'''
+    , new_user_data)
 
 # Commit the changes
 connection.commit()

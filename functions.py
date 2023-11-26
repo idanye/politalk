@@ -2,6 +2,7 @@ import json
 import datetime
 from uniLists import ivy_league_uni
 
+
 def is_ivy_student(profile):
     """
     Checks if the profile of the user is currently a student
@@ -66,3 +67,4 @@ def is_prev_ivy_student(profile):
         study_at_ivy = true
 
     return study_at_ivy
+
