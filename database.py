@@ -9,7 +9,7 @@ cursor = connection.cursor()
 # Example: Create a table
 cursor.execute('''
     CREATE TABLE UsersInfo (
-        ProfileID INTEGER PRIMARY KEY,
+        ProfileID TEXT PRIMARY KEY,
         Name TEXT,
         Education TEXT,
         IsCurrentlyStudent INTEGER,
