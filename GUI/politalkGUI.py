@@ -109,13 +109,13 @@ class Ui_MainWindow(object):
 "}\n"
 "")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("linkedin-logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("GUI/linkedin-logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.LoginButton.setIcon(icon)
         self.LoginButton.setObjectName("LoginButton")
         self.Logo = QtWidgets.QLabel(self.centralwidget)
         self.Logo.setGeometry(QtCore.QRect(40, 10, 231, 181))
         self.Logo.setText("")
-        self.Logo.setPixmap(QtGui.QPixmap("talk.png"))
+        self.Logo.setPixmap(QtGui.QPixmap("GUI/talk.png"))
         self.Logo.setScaledContents(True)
         self.Logo.setObjectName("Logo")
         self.Table = QtWidgets.QTableView(self.centralwidget)
@@ -153,11 +153,22 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "PoliTalk"))
         self.LoginButton.setText(_translate("MainWindow", "Log into LinkedIn"))
 
     def login_clicked(self) -> None:
-        UserSession().start()
+        self.LoginButton.setText("Logging in...")
+        self.LoginButton.setEnabled(False)
+        self.LoginButton.repaint()
+        
+        # Create a user session
+        user_session = UserSession()
+        successfully_logged = user_session.login()
+        print(successfully_logged)
+        user_session.quit()
+
+        self.LoginButton.setText("Log into LinkedIn")
+        self.LoginButton.setEnabled(True)
 
 
 if __name__ == "__main__":

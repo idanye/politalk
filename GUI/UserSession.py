@@ -13,15 +13,13 @@ options = webdriver.ChromeOptions()
 
 class UserSession:
     def __init__(self):
+        self.cookies = None
+
+    def start(self):
         try:
             self.driver = webdriver.Chrome(options = options)
         except:
             self.driver = webdriver.Chrome(ChromeDriverManager().install(), options = options)
-        self.cookies = None
-
-    def start(self):
-        self.driver.get("https://www.linkedin.com/login")
-        self.driver.implicitly_wait(1)
 
     def quit(self):
         self.driver.quit()
@@ -40,8 +38,6 @@ class UserSession:
     def show_chrome_driver(self):
         self.driver.maximize_window()
 
-    # Add other necessary methods like login, logout, etc.
-
     def login(self, headless: bool = False) -> bool:
         max_tries = 3
         current_try = 0
@@ -53,7 +49,7 @@ class UserSession:
         self.start()
 
         # fetches the login page
-        self.open_page('https://www.linkedin.com/login')
+        self.driver.get('https://www.linkedin.com/login')
 
         while not login_successful and current_try <= max_tries:
             login_successful = self.is_logged_in()
@@ -64,11 +60,11 @@ class UserSession:
         self.quit()
         return login_successful
 
-    def is_logged_in(self) -> bool:
-        xpath = "//a[@data-testid='SideNav_NewTweet_Button']"
+    def is_logged_in(self) -> bool: # GETS STUCK HERE. NEED TO FIX. 
+        xpath = "/html/body/div[5]/header/div/a/div/div/li-icon/svg"
 
         try:
-            WebDriverWait(self.bot, 30).until(ec.presence_of_all_elements_located((By.XPATH, xpath)))
+            WebDriverWait(self.driver, 30).until(ec.presence_of_all_elements_located((By.XPATH, xpath)))
             validation = True
         except Exception as e:
             logging.error("Exception occurred", exc_info=True)
