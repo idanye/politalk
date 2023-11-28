@@ -103,16 +103,12 @@ def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
     else:
         print(f"Error: {response.status_code}")
 
-
-# Example URL
-# url = "https://www.google.com/search?q=+%22Student+at+Harvard%22%20OR%20%22Student+at+Stanford%22%20OR%20%22Student+at+Princeton%22%20OR%20%22Student+at+Colombia%22%20-intitle:%22profiles%22%20-inurl:%22dir/+%22+site:linkedin.com/in/+OR+site:linkedin.com/pub/"
-
+## Trying out: 
+# url = get_search_text_url(school_name="Harvard")
 # search_text = extract_search_text_from_url(url)
 # result_list = get_new_connections(search_text)
 
 # print(result_list)
-
-get_search_text(school_name="Harvard")
 
 
 # # Authenticate using any Linkedin account credentials
