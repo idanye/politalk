@@ -57,7 +57,7 @@ def get_search_text_url(school_name):
         print(input_value_url)
 
 
-def extract_search_text_from_url(url):
+def get_search_text_from_url(url):
     """Recieves a url and returns the string search text from it
     """
     parsed_url = urlparse(url)
@@ -103,27 +103,39 @@ def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
     else:
         print(f"Error: {response.status_code}")
 
+
+def get_linkedin_profile_id(json_linkedin_url_file):
+    """Receives the a json file with the linkedin urls from get_new_connections function and 
+    returns the str of the profile id
+    """
+    with open(json_linkedin_url_file, "r") as json_file:
+        linkedin_urls = json.load(json_file)
+
+    # Extract LinkedIn IDs
+    linkedin_ids = [url.split("/")[-1] for url in linkedin_urls]
+
+    return linkedin_ids
+
+
 ## Trying out: 
 # url = get_search_text_url(school_name="Harvard")
-# search_text = extract_search_text_from_url(url)
+# search_text = get_search_text_from_url(url)
 # result_list = get_new_connections(search_text)
 
 # print(result_list)
 
 
-# # Authenticate using any Linkedin account credentials
-# api = Linkedin('phillipslola837@gmail.com', 'Lola3a4a77&')
+# Authenticate using any Linkedin account credentials
+api = Linkedin('phillipslola837@gmail.com', 'Lola3a4a77&')
 # # GET a profile
 # profile = api.get_profile('idan-yehiel1')
 # # GET a profiles contact info
 # contact_info = api.get_profile_contact_info('idan-yehiel1')
-# # GET 1st degree connections of a given profile
-# connections = api.get_profile_connections('idan-yehiel1')
+
 
 # experience = profile.get("experience", [])
 
 # school_names = functions.get_education_names(profile)
-
 
 # print(json.dumps(profile, indent=2))
 
