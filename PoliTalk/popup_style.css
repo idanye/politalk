@@ -1,0 +1,72 @@
+
+body {
+  width: 300px; /* Set the width of the popup */
+  text-align: center; /* Center-align text */
+  padding: 10px; /* Padding around the content */
+}
+
+h2{
+  font-family: 'Arial', sans-serif; 
+  font-size: 24px; /* Adjust the size as needed */
+  font-weight: bold;
+  color: #333; /* Dark gray text color */
+  margin-bottom: 20px;
+  text-align: center;
+  margin: 0 auto 20px; /* Centering the header with margin */
+  padding: 10px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  background-color: #f2f2f2; /* Light grey background */
+  padding: 15px;
+  border-radius: 8px;
+}
+
+#refreshButton {
+  background-color: #89b3f6;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  font: 10px 'Arial', sans-serif;
+  margin-top: 15px;
+}
+
+.contact-button {
+  padding: 10px;
+  width: 50%;
+  text-align: center;
+  margin-bottom: 5px;
+  background-color: #f0f0f0;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.contact-box {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 90px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:first-child {
+  border-bottom: 1px solid #ccc; /* Light grey border */
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.show {
+  display:block;
+}
