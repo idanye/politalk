@@ -7,7 +7,7 @@ from selenium.common.exceptions import TimeoutException
 from seleniumwire import webdriver as wiredriver
 from urllib.parse import parse_qs, urlparse
 import json
-import functions
+import linkedin_functions
 import requests
 import time
 
@@ -70,7 +70,8 @@ def get_search_text_from_url(url):
 
 
 def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
-    """Recieves the search text and returns a set of the linkedin urls from the search and saves it as a text file
+    """Recieves the search text and returns a set of the linkedin urls 
+    from the search and saves it as a text file
     """
     headers = {"apikey": "70eeee00-8dfa-11ee-b02d-f36f343cfa0b"}
 
@@ -125,17 +126,5 @@ def get_linkedin_profile_id(json_linkedin_url_file):
 # print(result_list)
 
 
-# Authenticate using any Linkedin account credentials
-api = Linkedin('phillipslola837@gmail.com', 'Lola3a4a77&')
-# # GET a profile
-# profile = api.get_profile('idan-yehiel1')
-# # GET a profiles contact info
-# contact_info = api.get_profile_contact_info('idan-yehiel1')
 
-
-# experience = profile.get("experience", [])
-
-# school_names = functions.get_education_names(profile)
-
-# print(json.dumps(profile, indent=2))
 

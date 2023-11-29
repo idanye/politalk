@@ -1,9 +1,25 @@
 import json
 import datetime
 from uniLists import ivy_league_uni
+from linkedin_api import Linkedin
+import sqlite3
 
 
 def is_ivy_student(profile):
+    """
+    Checks if the profile of the user is currently an ivy student
+    """
+    is_ivy_student = false
+    is_curr_student = is_curr_student(profile)
+    schoolName = get_last_schoolname(profile)
+
+    if is_curr_student and schoolName in ivy_league_uni:
+        is_ivy_student = true
+
+    return is_ivy_student
+
+
+def is_currently_student(profile):
     """
     Checks if the profile of the user is currently a student
     """
@@ -21,10 +37,10 @@ def is_ivy_student(profile):
         end_month = int(end_date.get("month", []))
         end_year = int(end_date.get("year", []))
         
-        if end_year <= current_year and end_month <= current_month and schoolName in ivy_league_uni:
+        if end_year <= current_year and end_month <= current_month:
             is_curr_student = true
 
-    return is_curr_student
+    return is_curr_student    
 
 
 def get_last_schoolname(profile):
@@ -68,3 +84,83 @@ def is_prev_ivy_student(profile):
 
     return study_at_ivy
 
+
+def get_profile_first_name(profile):
+    """Returns the first name of the profile user"""
+    first_name = profile.get("firstName", [])
+    return first_name
+
+
+def get_profile_last_name(profile):
+    """Returns the last name of the profile user"""
+    last_name = profile.get("lastName", [])
+    return last_name
+
+
+def get_profile_industry_name(profile):
+    """Returns the industry name of the profile user"""
+    industry_name = profile.get("industryName", [])
+    return industry_name
+
+
+def get_profile_headline(profile):
+    """Returns the industry name of the profile user"""
+    industry_name = profile.get("industryName", [])
+    return industry_name
+
+def get_binary_value(true_false_value):
+    """Returns the binary value of the value"""
+    return 1 if true_false_value else 0
+
+
+def add_profile_to_database(profile_id):
+    # Connect to a database (or create a new one if it doesn't exist)
+    connection = sqlite3.connect('usersinfo.db')
+    cursor = connection.cursor()
+
+    # cursor.execute('''
+    #     CREATE TABLE UsersInfo (
+    #     IndexID INTEGER PRIMARY KEY AUTOINCREMENT,
+    #     ProfileID TEXT UNIQUE,
+    #     FirstName TEXT,
+    #     LastName TEXT,
+    #     Education TEXT,
+    #     IsCurrentlyStudent INTEGER,
+    #     WhereCurrentlyStudent TEXT,
+    #     IsIvyStudent INTEGER
+    # );
+    # ''')
+
+    # Authenticate using any Linkedin account credentials
+    api = Linkedin('phillipslola837@gmail.com', 'Lola3a4a77&')
+    # # GET a profile
+    profile = api.get_profile(profile_id)
+    first_name = get_profile_first_name(profile)
+    last_name = get_profile_last_name(profile)
+    where_curr_student = get_last_schoolname(profile)
+    education = get_last_schoolname(profile)
+    is_curr_ivy_student = get_binary_value(is_ivy_student(profile))
+    is_curr_student = get_binary_value(is_currently_student(profile))
+
+    if is_curr_ivy_student:
+        current_user_data = (profile_id, first_name, last_name, education, is_curr_student, where_curr_student, is_curr_ivy_student)
+
+        cursor.execute("""
+        INSERT INTO UsersInfo 
+            (ProfileID, 
+            FirstName, 
+            LastName, 
+            Education, 
+            IsCurrentlyStudent, 
+            WhereCurrentlyStudent, 
+            IsIvyStudent)
+        VALUES (?, ?, ?, ?, ?, ?, ?)""", 
+        current_user_data)
+        
+    # Commit the changes
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+
+# print(json.dumps(contact_info, indent=2))
