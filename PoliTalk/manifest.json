@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "PoliTalk",
+  "version": "1.0",
+  "description": "Suggests contacts to start a conversation with on LinkedIn",
+  "permissions": ["activeTab"],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/talk_16.png",
+      "48": "images/talk_48.png",
+      "128": "images/talk_128.png"
+    }
+  },
+  "icons": {
+    "16": "images/talk_16.png",
+    "48": "images/talk_48.png",
+    "128": "images/talk_128.png"
+  },
+  "web_accessible_resources": [
+    "names.json"
+  ]
+}
