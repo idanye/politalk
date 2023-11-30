@@ -99,33 +99,44 @@ def is_prev_ivy_student(profile):
 
 def get_profile_first_name(profile):
     """Returns the first name of the profile user"""
-    first_name = profile.get("firstName", [])
+    first_name = profile.get("firstName", "")
     return first_name
 
 
 def get_profile_last_name(profile):
     """Returns the last name of the profile user"""
-    last_name = profile.get("lastName", [])
+    last_name = profile.get("lastName", "")
     return last_name
 
 
 def get_profile_industry_name(profile):
     """Returns the industry name of the profile user"""
-    industry_name = profile.get("industryName", [])
+    industry_name = profile.get("industryName", "")
     return industry_name
 
 
 def get_profile_headline(profile):
     """Returns the industry name of the profile user"""
-    industry_name = profile.get("industryName", [])
-    return industry_name
+    headline = profile.get("headline", "")
+    return headline
+
 
 def get_binary_value(true_false_value):
     """Returns the binary value of the value"""
     return 1 if true_false_value else 0
 
 
-def add_profile_to_database(profile_id):
+def get_smallest_linkedin_photo_url(profile):
+    """ Gets the smallest linkedin photo (100*100) of the given profile
+    """
+    smallest_img_url = ""
+    display_pic_url = profile.get("displayPictureUrl", "")
+    display_size = profile.get("img_100_100", "")
+    smallest_img_url = display_pic_url + display_size
+    return smallest_img_url
+
+
+def add_profile_to_database(profile_id, profile_url):
     """ Adds a given profile_id to the data base according to the requried columns values
     """
     # Connect to a database (or create a new one if it doesn't exist)
@@ -150,6 +161,7 @@ def add_profile_to_database(profile_id):
     # # GET a profile
     profile = api.get_profile(profile_id)
     # print(json.dumps(profile, indent=2))
+    print("-------------------------------------------")
     first_name = get_profile_first_name(profile)
     print(f"First name: {first_name}")
     last_name = get_profile_last_name(profile)
@@ -164,18 +176,20 @@ def add_profile_to_database(profile_id):
     print(f"Is a student now: {is_curr_student}")
     pic_url = get_smallest_linkedin_photo_url(profile)
     # print(f"Picture url: {pic_url}")
+    headline = get_profile_headline(profile)
+    print(f"Headline: {headline}")
 
     if is_curr_ivy_student:
-        current_user_data = (profile_id, first_name, last_name, education, is_curr_student, where_curr_student, is_curr_ivy_student, pic_url)
+        current_user_data = (profile_id, first_name, last_name, education, is_curr_student, where_curr_student, is_curr_ivy_student, profile_url, pic_url, headline)
 
-        print(f"Adding: {current_user_data}")
+        print(f"Printing: {current_user_data}")
         
         try:
             cursor.execute("""
                 INSERT INTO UsersInfo 
                 (ProfileID, FirstName, LastName, Education, IsCurrentlyStudent,
-                WhereCurrentlyStudent, IsIvyStudent, PictureURL)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                WhereCurrentlyStudent, IsIvyStudent, ProfileURL, PictureURL, Headline)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 current_user_data)
 
             connection.commit()
@@ -187,16 +201,6 @@ def add_profile_to_database(profile_id):
 
     cursor.close()
     connection.close()
-
-
-def get_smallest_linkedin_photo_url(profile):
-    """ Gets the smallest linkedin photo (100*100) of the given profile
-    """
-    smallest_img_url = ""
-    display_pic_url = profile.get("displayPictureUrl", [])
-    display_size = profile.get("img_100_100", [])
-    smallest_img_url = display_pic_url + display_size
-    return smallest_img_url
 
 
 

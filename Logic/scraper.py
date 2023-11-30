@@ -6,10 +6,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from seleniumwire import webdriver as wiredriver
 from urllib.parse import parse_qs, urlparse
-import json
 from linkedin_functions import add_profile_to_database
+from itertools import islice
+import json
 import requests
 import time
+
 
 def get_search_text_url(school_name):
     """ Returns a str of the search text url from the recruitin website from a chosen university
@@ -105,28 +107,36 @@ def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
         print(f"Error: {response.status_code}")
 
 
-def get_linkedin_profile_id(json_linkedin_url_file_path):
-    """Receives the a json file with the linkedin urls from get_new_connections function and 
-    returns a list of str of the profile id
+def get_linkedin_profile_info(json_linkedin_url_file_path):
+    """Receives a JSON file with LinkedIn URLs from get_new_connections function and 
+    returns a dictionary with profile IDs as keys and profile URLs as values.
     """
     with open(json_linkedin_url_file_path, "r") as json_file:
         linkedin_urls = json.load(json_file)
 
-    # Extract LinkedIn IDs
-    linkedin_ids = [url.split("/")[-1] for url in linkedin_urls]
+    # Extract LinkedIn IDs and create a dictionary
+    linkedin_ids_dict = {}
+    for url in linkedin_urls:
+        profile_id = url.split("/")[-1]
+        
+        # Check if there are additional parameters in the URL
+        if "?" in profile_id:
+            # Remove additional parameters
+            profile_id = profile_id.split("?")[0]
+        
+        linkedin_ids_dict[profile_id] = url
 
-    return linkedin_ids
-
+    return linkedin_ids_dict
 
 # Trying out: 
 # url = get_search_text_url(school_name="Harvard")
 # search_text = get_search_text_from_url(url)
 # result_list = get_new_connections(search_text)
-ids_list = get_linkedin_profile_id('Logic\linkedin_urls_trialone.json')
+user_info_dict = get_linkedin_profile_info('Logic\linkedin_urls_trialone.json')
 print("Starting run")
 
-for user_id in ids_list[10:]:
-    add_profile_to_database(user_id)
+for profile_id, profile_url in user_info_dict.items():
+    add_profile_to_database(profile_id, profile_url)
     
 print('done')
 
