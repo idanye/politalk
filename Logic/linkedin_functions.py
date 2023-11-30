@@ -9,12 +9,12 @@ def is_ivy_student(profile):
     """
     Checks if the profile of the user is currently an ivy student
     """
-    is_ivy_student = false
-    is_curr_student = is_curr_student(profile)
+    is_ivy_student = False
+    is_curr_student = is_currently_student(profile)
     schoolName = get_last_schoolname(profile)
 
     if is_curr_student and schoolName in ivy_league_uni:
-        is_ivy_student = true
+        is_ivy_student = True
 
     return is_ivy_student
 
@@ -23,24 +23,36 @@ def is_currently_student(profile):
     """
     Checks if the profile of the user is currently a student
     """
-    is_curr_student = false
+    is_curr_student = False
     education = profile.get("education", [])
     current_time = datetime.datetime.now()
     current_year = int(current_time.year)
     current_month = int(current_time.month)
     schoolName = get_last_schoolname(profile)
 
-    if education != []:
+    if education:
         last_education = education[0]
-        time_period = last_education["timePeriod"]
-        end_date = time_period["endDate"]
-        end_month = int(end_date.get("month", []))
-        end_year = int(end_date.get("year", []))
+        time_period = last_education.get("timePeriod", {})
         
-        if end_year <= current_year and end_month <= current_month:
-            is_curr_student = true
+        if "endDate" in time_period:
+            end_date = time_period["endDate"]
+            end_month = end_date.get("month", None)
+            end_year = end_date.get("year", None)
 
-    return is_curr_student    
+            if end_year is not None:
+                end_year = int(end_year)
+
+                if end_month is None:
+                    if end_year >= current_year:
+                        is_curr_student = True
+
+                elif end_month is not None:
+                    end_month = int(end_month)
+
+                    if end_year > current_year or (end_year == current_year and end_month >= current_month):
+                        is_curr_student = True
+
+    return is_curr_student
 
 
 def get_last_schoolname(profile):
@@ -75,12 +87,12 @@ def get_education_names(profile):
 def is_prev_ivy_student(profile):
     """Checks if the person used to study at an ivy league university"""
 
-    study_at_ivy = false
+    study_at_ivy = False
     education_schools_names = get_uni_names(profile)
     common_schools = set(get_uni_names) & set(ivy_league_uni)
 
     if common_schools:
-        study_at_ivy = true
+        study_at_ivy = True
 
     return study_at_ivy
 
@@ -114,10 +126,12 @@ def get_binary_value(true_false_value):
 
 
 def add_profile_to_database(profile_id):
+    """ Adds a given profile_id to the data base according to the requried columns values
+    """
     # Connect to a database (or create a new one if it doesn't exist)
     connection = sqlite3.connect('usersinfo.db')
     cursor = connection.cursor()
-
+    
     # cursor.execute('''
     #     CREATE TABLE UsersInfo (
     #     IndexID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -135,32 +149,56 @@ def add_profile_to_database(profile_id):
     api = Linkedin('phillipslola837@gmail.com', 'Lola3a4a77&')
     # # GET a profile
     profile = api.get_profile(profile_id)
+    # print(json.dumps(profile, indent=2))
     first_name = get_profile_first_name(profile)
+    print(f"First name: {first_name}")
     last_name = get_profile_last_name(profile)
+    print(f"Last name: {last_name}")
     where_curr_student = get_last_schoolname(profile)
+    # print(f"Where is currently a student: {where_curr_student}")
     education = get_last_schoolname(profile)
+    print(f"Education: {education}")
     is_curr_ivy_student = get_binary_value(is_ivy_student(profile))
+    print(f"Is an ivy student now: {is_curr_ivy_student}")
     is_curr_student = get_binary_value(is_currently_student(profile))
+    print(f"Is a student now: {is_curr_student}")
+    pic_url = get_smallest_linkedin_photo_url(profile)
+    # print(f"Picture url: {pic_url}")
 
     if is_curr_ivy_student:
-        current_user_data = (profile_id, first_name, last_name, education, is_curr_student, where_curr_student, is_curr_ivy_student)
+        current_user_data = (profile_id, first_name, last_name, education, is_curr_student, where_curr_student, is_curr_ivy_student, pic_url)
 
-        cursor.execute("""
-        INSERT INTO UsersInfo 
-            (ProfileID, 
-            FirstName, 
-            LastName, 
-            Education, 
-            IsCurrentlyStudent, 
-            WhereCurrentlyStudent, 
-            IsIvyStudent)
-        VALUES (?, ?, ?, ?, ?, ?, ?)""", 
-        current_user_data)
+        print(f"Adding: {current_user_data}")
         
-    # Commit the changes
-    connection.commit()
+        try:
+            cursor.execute("""
+                INSERT INTO UsersInfo 
+                (ProfileID, FirstName, LastName, Education, IsCurrentlyStudent,
+                WhereCurrentlyStudent, IsIvyStudent, PictureURL)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                current_user_data)
+
+            connection.commit()
+
+        except sqlite3.IntegrityError:
+            # Handle the case where the unique constraint is violated (ProfileID already exists)
+            print(f"ProfileID '{profile_id}' already exists. Skipping insertion.")
+            connection.rollback()  # Rollback the transaction to keep the database in a consistent state
+
     cursor.close()
     connection.close()
+
+
+def get_smallest_linkedin_photo_url(profile):
+    """ Gets the smallest linkedin photo (100*100) of the given profile
+    """
+    smallest_img_url = ""
+    display_pic_url = profile.get("displayPictureUrl", [])
+    display_size = profile.get("img_100_100", [])
+    smallest_img_url = display_pic_url + display_size
+    return smallest_img_url
+
+
 
 
 # print(json.dumps(contact_info, indent=2))

@@ -7,7 +7,7 @@ from selenium.common.exceptions import TimeoutException
 from seleniumwire import webdriver as wiredriver
 from urllib.parse import parse_qs, urlparse
 import json
-import linkedin_functions
+from linkedin_functions import add_profile_to_database
 import requests
 import time
 
@@ -57,10 +57,10 @@ def get_search_text_url(school_name):
         print(input_value_url)
 
 
-def get_search_text_from_url(url):
-    """Recieves a url and returns the string search text from it
+def get_search_text_from_url(profile_url):
+    """Recieves a profile_url and returns the string search text from it
     """
-    parsed_url = urlparse(url)
+    parsed_url = urlparse(profile_url)
     query_params = parse_qs(parsed_url.query)
 
     # Extract the 'q' parameter, which contains the search text
@@ -105,11 +105,11 @@ def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
         print(f"Error: {response.status_code}")
 
 
-def get_linkedin_profile_id(json_linkedin_url_file):
+def get_linkedin_profile_id(json_linkedin_url_file_path):
     """Receives the a json file with the linkedin urls from get_new_connections function and 
-    returns the str of the profile id
+    returns a list of str of the profile id
     """
-    with open(json_linkedin_url_file, "r") as json_file:
+    with open(json_linkedin_url_file_path, "r") as json_file:
         linkedin_urls = json.load(json_file)
 
     # Extract LinkedIn IDs
@@ -118,12 +118,18 @@ def get_linkedin_profile_id(json_linkedin_url_file):
     return linkedin_ids
 
 
-## Trying out: 
+# Trying out: 
 # url = get_search_text_url(school_name="Harvard")
 # search_text = get_search_text_from_url(url)
 # result_list = get_new_connections(search_text)
+ids_list = get_linkedin_profile_id('Logic\linkedin_urls_trialone.json')
+print("Starting run")
 
-# print(result_list)
+for user_id in ids_list[10:]:
+    add_profile_to_database(user_id)
+    
+print('done')
+
 
 
 
