@@ -8,9 +8,30 @@ document.addEventListener('DOMContentLoaded', function () {
 function loadContacts() {
   var contactList = document.getElementById('contactList');
   contactList.innerHTML = ''; // Clear existing contacts
-  var contacts = ['Alice Johnson', 'Bob Smith', 'Charlie Davis']; // Your dummy contacts
+  var contacts = [
+    "Alice Johnson",
+    "Bob Smith",
+    "Charlie Davis",
+    "Diana Reed",
+    "Ethan Hall",
+    "Fiona Clarke",
+    "George Wright",
+    "Hannah Scott",
+    "Isaac Phillips",
+    "Jack Roberts",
+    "Katie Green",
+    "Liam Edwards",
+    "Mia Lewis",
+    "Nathan Wood",
+    "Olivia Harris",
+    "Ran Zaaroor",
+    "Sophie King"
+  ]; // Your dummy contacts
 
-  contacts.forEach(function (contact, index) {
+  // Get three random contacts
+  var randomContacts = getRandomContacts(contacts, 3);
+
+  randomContacts.forEach(function (contact, index) {
     var div = document.createElement('div');
     div.className = 'contact-box';
 
@@ -63,6 +84,21 @@ function toggleDropdown(event, index) {
   dropdown.style.left = buttonRect.right + 'px'; // Position to the right of the button
   dropdown.style.top = buttonRect.top + 'px'; // Align to the top of the button
   dropdown.classList.toggle('show');
+}
+
+function getRandomContacts(contacts, num) {
+  var randomContacts = [];
+  var usedIndices = new Set(); // To keep track of used indices
+
+  while(randomContacts.length < num) {
+    var randomIndex = Math.floor(Math.random() * contacts.length);
+    if (!usedIndices.has(randomIndex)) {
+      randomContacts.push(contacts[randomIndex]);
+      usedIndices.add(randomIndex);
+    }
+  }
+
+  return randomContacts;
 }
 
 // Close the dropdown if the user clicks outside of it
