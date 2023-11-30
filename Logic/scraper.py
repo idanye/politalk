@@ -8,6 +8,7 @@ from seleniumwire import webdriver as wiredriver
 from urllib.parse import parse_qs, urlparse
 from linkedin_functions import add_profile_to_database
 from itertools import islice
+from uniLists import ivy_league_uni
 import json
 import requests
 import time
@@ -41,7 +42,7 @@ def get_search_text_url(school_name):
             EC.element_to_be_clickable((By.CSS_SELECTOR, "button#fly-baby.btn.btn--block.btn--primary")))
         find_button.click()
 
-        print(f"clicked button 1")
+        # print(f"clicked button 1")
 
         input_element = WebDriverWait(driver, 20).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, "input#fe_text.field__control.field__control--lg")))
@@ -75,23 +76,26 @@ def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
     """Recieves the search text and returns a set of the linkedin urls 
     from the search and saves it as a text file
     """
-    headers = {"apikey": "70eeee00-8dfa-11ee-b02d-f36f343cfa0b"}
+    #RapidApi
+    url = "https://real-time-web-search.p.rapidapi.com/search"
 
-    params = (
-    ("q", search_text),
-    ("num","100"),
-    ("start","2"),
-    );
+    querystring = {"q":search_text, 
+                    "limit":"300"}
 
-    response = requests.get('https://app.zenserp.com/api/v2/search', headers=headers, params=params);
+    headers = {
+        "X-RapidAPI-Key": "191e432bb6mshddc5b2894664670p1b5143jsn4e664d04e498",
+        "X-RapidAPI-Host": "real-time-web-search.p.rapidapi.com"
+    }
 
-    # Check if the request was successful (status code 200)
+    response = requests.get(url, headers=headers, params=querystring)
+
+    #
     if response.status_code == 200:
         # Parse the JSON content
         url_links = set()
 
         json_content = response.json()
-        pos_responses = json_content.get("organic", [])
+        pos_responses = json_content.get("data", [])
         
         # Extract URLs from the "organic" results
         for position in pos_responses:
@@ -106,6 +110,39 @@ def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
     else:
         print(f"Error: {response.status_code}")
 
+    # Zenserp
+    # headers = {"apikey": "70eeee00-8dfa-11ee-b02d-f36f343cfa0b"}
+
+    # params = (
+    # ("q", search_text),
+    # ("num","100"),
+    # ("start","2"),
+    # );
+
+    # response = requests.get('https://app.zenserp.com/api/v2/search', headers=headers, params=params);
+    
+
+    # Check if the request was successful (status code 200)
+    # if response.status_code == 200:
+    #     # Parse the JSON content
+    #     url_links = set()
+
+    #     json_content = response.json()
+    #     pos_responses = json_content.get("organic", [])
+        
+    #     # Extract URLs from the "organic" results
+    #     for position in pos_responses:
+    #         url_links.add(position.get("url", ""))
+
+    #     # Save the results to a JSON file
+    #     with open(output_file, "w") as file:
+    #         json.dump(list(url_links), file)
+        
+    #     return list(url_links)
+
+    # else:
+    #     print(f"Error: {response.status_code}")
+
 
 def get_linkedin_profile_info(json_linkedin_url_file_path):
     """Receives a JSON file with LinkedIn URLs from get_new_connections function and 
@@ -116,6 +153,7 @@ def get_linkedin_profile_info(json_linkedin_url_file_path):
 
     # Extract LinkedIn IDs and create a dictionary
     linkedin_ids_dict = {}
+    
     for url in linkedin_urls:
         profile_id = url.split("/")[-1]
         
@@ -128,19 +166,25 @@ def get_linkedin_profile_info(json_linkedin_url_file_path):
 
     return linkedin_ids_dict
 
-# Trying out: 
-# url = get_search_text_url(school_name="Harvard")
-# search_text = get_search_text_from_url(url)
-# result_list = get_new_connections(search_text)
-user_info_dict = get_linkedin_profile_info('Logic\linkedin_urls_trialone.json')
-print("Starting run")
 
-for profile_id, profile_url in user_info_dict.items():
-    add_profile_to_database(profile_id, profile_url)
-    
-print('done')
+def main():
+    print("Preparing")
+
+    # Testing out: 
+    for ivy_uni in ivy_league_uni[:1]:
+        url = get_search_text_url(school_name=ivy_uni)
+        search_text = get_search_text_from_url(url)
+        print(search_text)
+        result_list = get_new_connections(search_text)
+    #     user_info_dict = get_linkedin_profile_info('Logic\\linkedin_urls_trialtwo.json')
+
+    #     print("Starting run")
+
+    #     for profile_id, profile_url in user_info_dict.items():
+    #         add_profile_to_database(profile_id, profile_url)
+        
+    # print('Finished Running')
 
 
-
-
-
+if __name__ == "__main__":
+    main()

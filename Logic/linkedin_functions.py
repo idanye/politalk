@@ -1,6 +1,5 @@
 import json
 import datetime
-from uniLists import ivy_league_uni
 from linkedin_api import Linkedin
 import sqlite3
 
