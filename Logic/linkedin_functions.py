@@ -1,6 +1,7 @@
+from linkedin_api import Linkedin
+from uniLists import ivy_league_uni
 import json
 import datetime
-from linkedin_api import Linkedin
 import sqlite3
 
 
@@ -62,7 +63,14 @@ def get_last_schoolname(profile):
 
     if education != []:
         last_education = education[0]
-        schoolName = last_education["school"]["schoolName"]
+        if len(education) == 1:
+            schoolName = last_education["schoolName"]
+        else:
+            try:
+                # print(json.dumps(last_education, indent=2))
+                schoolName = last_education["school"]["schoolName"]
+            except KeyError:
+                schoolName = last_education["schoolName"]
 
     return schoolName
 
@@ -159,7 +167,6 @@ def add_profile_to_database(profile_id, profile_url):
     api = Linkedin('phillipslola837@gmail.com', 'Lola3a4a77&')
     # # GET a profile
     profile = api.get_profile(profile_id)
-    # print(json.dumps(profile, indent=2))
     print("-------------------------------------------")
     first_name = get_profile_first_name(profile)
     print(f"First name: {first_name}")
@@ -180,8 +187,6 @@ def add_profile_to_database(profile_id, profile_url):
 
     if is_curr_ivy_student:
         current_user_data = (profile_id, first_name, last_name, education, is_curr_student, where_curr_student, is_curr_ivy_student, profile_url, pic_url, headline)
-
-        print(f"Printing: {current_user_data}")
         
         try:
             cursor.execute("""
@@ -190,7 +195,7 @@ def add_profile_to_database(profile_id, profile_url):
                 WhereCurrentlyStudent, IsIvyStudent, ProfileURL, PictureURL, Headline)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 current_user_data)
-
+            print(f"Printing: {current_user_data}")
             connection.commit()
 
         except sqlite3.IntegrityError:

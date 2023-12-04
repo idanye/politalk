@@ -5,12 +5,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from seleniumwire import webdriver as wiredriver
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlparse, unquote
 from linkedin_functions import add_profile_to_database
 from itertools import islice
 from uniLists import ivy_league_uni
 import json
 import requests
+import re
 import time
 
 
@@ -47,7 +48,8 @@ def get_search_text_url(school_name):
         input_element = WebDriverWait(driver, 20).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, "input#fe_text.field__control.field__control--lg")))
 
-        input_value_url = input_element.get_attribute("value")
+        input_value_url = str(input_element.get_attribute("value"))
+        return input_value_url
 
     except TimeoutException as te:
         print(f"Timeout error occurred: {te}")
@@ -57,19 +59,19 @@ def get_search_text_url(school_name):
 
     finally:
         driver.quit()
-        print(input_value_url)
 
 
 def get_search_text_from_url(profile_url):
-    """Recieves a profile_url and returns the string search text from it
+    """Receives a profile_url and returns the string search text from it
     """
-    parsed_url = urlparse(profile_url)
-    query_params = parse_qs(parsed_url.query)
+    # Use regular expression to find the search query part of the URL
+    match = re.search(r'\?q=([^&]+)', profile_url)
 
-    # Extract the 'q' parameter, which contains the search text
-    search_text = query_params.get('q', [''])[0]
-
-    return search_text
+    if match:
+        search_query = unquote(match.group(1).replace('+', ' '))
+        return search_query
+    else:
+        print("Search query not found in the URL.")
 
 
 def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
@@ -172,16 +174,20 @@ def main():
 
     # Testing out: 
     for ivy_uni in ivy_league_uni[:1]:
-        url = get_search_text_url(school_name=ivy_uni)
-        search_text = get_search_text_from_url(url)
-        print(search_text)
-        result_list = get_new_connections(search_text)
-    #     user_info_dict = get_linkedin_profile_info('Logic\\linkedin_urls_trialtwo.json')
+        # url = get_search_text_url(school_name=ivy_uni)
+        # search_text = get_search_text_from_url(url)
+        # # print(search_text)
+        # result_list = get_new_connections(search_text)
+        # print(result_list)
+        user_info_dict = get_linkedin_profile_info('linkedin_urls_trialtwo.json')
+        # print(user_info_dict)
+        print("Starting run")
+        # add_profile_to_database("giselle-goldfischer-b531ab22a", "https://www.linkedin.com/in/giselle-goldfischer-b531ab22a")
 
-    #     print("Starting run")
-
-    #     for profile_id, profile_url in user_info_dict.items():
-    #         add_profile_to_database(profile_id, profile_url)
+        for i in range(12):
+            for profile_id, profile_url in user_info_dict.items():
+                add_profile_to_database(profile_id, profile_url)
+                i += 1
         
     # print('Finished Running')
 
