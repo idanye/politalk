@@ -18,6 +18,14 @@
     "128": "images/talk_128.png"
   },
   "web_accessible_resources": [
-    "names.json"
+    "popup_style.css",
+    "images/PoliTalk.png",
+    "images/PoliTalkHover.png"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/*"],
+      "js": ["contentScript.js"]
+    }
   ]
 }

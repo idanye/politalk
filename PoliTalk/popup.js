@@ -73,7 +73,7 @@ function loadContacts() {
 function toggleDropdown(event, index) {
   // Close all open dropdowns first
   var dropdowns = document.getElementsByClassName('dropdown-content');
-  for (var i = 0; i < dropdowns.length; i++) {
+  for (let i = 0; i < dropdowns.length; i++) {
     if (i !== index) {
       // Exclude the current dropdown
       dropdowns[i].classList.remove('show');
@@ -86,6 +86,7 @@ function toggleDropdown(event, index) {
   dropdown.classList.toggle('show');
 }
 
+// returns an array of num random contacts from the contacts array 
 function getRandomContacts(contacts, num) {
   var randomContacts = [];
   var usedIndices = new Set(); // To keep track of used indices
@@ -105,9 +106,8 @@ function getRandomContacts(contacts, num) {
 window.onclick = function (event) {
   if (!event.target.matches('.contact-button')) {
     var dropdowns = document.getElementsByClassName('dropdown-content');
-    var i;
-    for (i = 0; i < dropdowns.length; i++) {
-      var openDropdown = dropdowns[i];
+    for (let i = 0; i < dropdowns.length; i++) {
+      let openDropdown = dropdowns[i];
       if (openDropdown.classList.contains('show')) {
         openDropdown.classList.remove('show');
       }
