@@ -3,7 +3,7 @@
   "name": "PoliTalk",
   "version": "1.0",
   "description": "Suggests contacts to start a conversation with on LinkedIn",
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab", "tabs"],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -19,6 +19,7 @@
   },
   "web_accessible_resources": [
     "popup_style.css",
+    "extensionButton.css",
     "images/PoliTalk.png",
     "images/PoliTalkHover.png"
   ],
