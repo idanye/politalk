@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from seleniumwire import webdriver as wiredriver
 from urllib.parse import parse_qs, urlparse, unquote
-from linkedin_functions import add_profile_to_database
+from linkedin_functions import add_profile_to_database, is_profile_id_in_database
 from itertools import islice
 from uniLists import ivy_league_uni
 import json
@@ -179,15 +179,17 @@ def main():
         # # print(search_text)
         # result_list = get_new_connections(search_text)
         # print(result_list)
-        user_info_dict = get_linkedin_profile_info('linkedin_urls_trialtwo.json')
+        # user_info_dict = get_linkedin_profile_info('linkedin_urls_trialtwo.json')
+        user_info_dict = get_linkedin_profile_info('newdemojs.json')
         # print(user_info_dict)
         print("Starting run")
-        # add_profile_to_database("giselle-goldfischer-b531ab22a", "https://www.linkedin.com/in/giselle-goldfischer-b531ab22a")
-
-        for i in range(12):
-            for profile_id, profile_url in user_info_dict.items():
+        
+        for profile_id, profile_url in user_info_dict.items():
+            if not is_profile_id_in_database(profile_id):
+                print(f"Adding user: {profile_id}")
                 add_profile_to_database(profile_id, profile_url)
-                i += 1
+            else:
+                print(f"User: *{profile_id}* already exists in our database")
         
     # print('Finished Running')
 

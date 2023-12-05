@@ -12,11 +12,21 @@ def is_ivy_student(profile):
     is_ivy_student = False
     is_curr_student = is_currently_student(profile)
     schoolName = get_last_schoolname(profile)
-
+    
     if is_curr_student and schoolName in ivy_league_uni:
         is_ivy_student = True
 
     return is_ivy_student
+
+def is_ivy_school(schoolName):
+    """
+    Checks if the school name of the user is an ivy league
+    """
+    for ivy_school in ivy_league_uni:
+        if schoolName in ivy_school or schoolName == ivy_school:
+            return True
+        else:
+            return False
 
 
 def is_currently_student(profile):
@@ -63,14 +73,12 @@ def get_last_schoolname(profile):
 
     if education != []:
         last_education = education[0]
-        if len(education) == 1:
+
+        try:
+            # print(json.dumps(last_education, indent=2))
+            schoolName = last_education["school"]["schoolName"]
+        except KeyError:
             schoolName = last_education["schoolName"]
-        else:
-            try:
-                # print(json.dumps(last_education, indent=2))
-                schoolName = last_education["school"]["schoolName"]
-            except KeyError:
-                schoolName = last_education["schoolName"]
 
     return schoolName
 
@@ -201,12 +209,37 @@ def add_profile_to_database(profile_id, profile_url):
         except sqlite3.IntegrityError:
             # Handle the case where the unique constraint is violated (ProfileID already exists)
             print(f"ProfileID '{profile_id}' already exists. Skipping insertion.")
-            connection.rollback()  # Rollback the transaction to keep the database in a consistent state
+            connection.rollback()
 
     cursor.close()
     connection.close()
 
-
-
-
 # print(json.dumps(contact_info, indent=2))
+
+def is_profile_id_in_database(profile_id):
+    try:
+        # Connect to the SQLite database
+        connection = sqlite3.connect('usersinfo.db')
+        cursor = connection.cursor()
+
+        # Execute a SELECT query to check if the profile_id is in the database
+        cursor.execute("SELECT ProfileID FROM UsersInfo WHERE ProfileID = ?", (profile_id,))
+        result = cursor.fetchone()  # Fetch the first result
+
+        # # Print the query and result for debugging
+        # print(f"Executed SQL query: SELECT ProfileID FROM UsersInfo WHERE ProfileID = {profile_id}")
+        # print(f"Result from the database: {result}")
+
+        # If result is not None, the profile_id is in the database
+        if result is None:
+            return False
+        else:
+            return True
+
+    except sqlite3.Error as e:
+        print(f"SQLite error: {e}")
+
+    finally:
+        cursor.close()
+        connection.close()
+
