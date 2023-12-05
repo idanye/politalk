@@ -4,10 +4,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 15px;
 }
 
 /* Styles for the icon container */
 .extension_button .icon_container {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -16,8 +18,8 @@
 
 /* Styles for the icon within the button */
 .extension_button img {
-  width: 25px;
-  height: 25px;
+  width: 23px;
+  height: 23px;
 }
 
 /* Styles for the text underneath the icon */
@@ -35,4 +37,135 @@
 
 .extension_button:hover span {
   color: #191919;
+}
+
+/* Styles for the line under the icon */
+.extension_button .underline {
+  display: block;  /* Always display, but initially with width 0 */
+  width: 0;  /* Start width */
+  height: 2px;  /* Thickness of the line */
+  background-color: #000;  /* Color of the line */
+  position: absolute;
+  bottom: -5px;  /* Position it below the icon */
+  left: 50%;
+  transform: translateX(-50%); /* Center the line */
+  transition: width 0.2s ease;
+  margin-bottom: -1px; /* Animate the width */
+}
+
+/* Class to show the line */
+.extension_button.show-line .underline {
+  width: 75px;  /* Full width when shown */
+}
+
+/* Styles for the popup */
+.politalk_popup {
+  position: fixed; /* Keeps the popup in place during scrolling */
+  display: flex;
+  z-index: 1001;
+  width: 250px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 15px;
+  box-sizing: border-box;
+  /* Remove top and left properties here, will set them dynamically */
+}
+
+/* Initially hide the popup */
+.politalk_popup {
+  display: none;
+  /* ... other styling ... */
+}
+
+/* Show the popup when this class is added */
+.show-popup {
+  display: block;
+}
+
+.politalk_popup h2 {
+    font-size: 20px; /* Slightly larger font size */
+    color: #333; /* A dark shade for high contrast */
+    font-weight: 600; /* Medium-bold font weight */
+    margin-bottom: 20px; /* More space below the title */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle text shadow for depth */
+    font-family: 'Arial', sans-serif; /* Consider using a web-safe or custom font */
+}
+
+.politalk_popup .card {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  text-align: center;
+  margin: 0 10px;
+}
+
+.politalk_popup .card .profile-image {
+  width: 80px; /* Adjust as needed */
+  height: 80px; /* Adjust as needed */
+  border-radius: 50%; /* Circular image */
+  margin-bottom: 10px;
+}
+
+.politalk_popup .card h3 {
+  margin: 5px 0;
+  font-size: 16px;
+}
+
+.politalk_popup .card p {
+  font-size: 14px;
+  color: #666;
+}
+
+.arrow {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10; 
+}
+
+/* Common styles for both arrows */
+.politalk_popup .arrow {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+/* Specific styles for the left arrow */
+.politalk_popup .arrow.left {
+  position: absolute;
+  left: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Specific styles for the right arrow */
+.politalk_popup .arrow.right {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
