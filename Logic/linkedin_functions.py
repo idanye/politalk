@@ -1,22 +1,24 @@
-from linkedin_api import Linkedin
+# from linkedin_api import Linkedin
 from uniLists import ivy_league_uni
+import requests
 import json
 import datetime
 import sqlite3
-
 
 def is_ivy_student(profile):
     """
     Checks if the profile of the user is currently an ivy student
     """
     is_ivy_student = False
-    is_curr_student = is_currently_student(profile)
+    is_curr_student = is_currently_student_new(profile) #with new function
+    is_curr_researcher_student = is_currently_researcher_student(profile)
     schoolName = get_last_schoolname(profile)
     
-    if is_curr_student and schoolName in ivy_league_uni:
+    if (is_curr_student and is_ivy_school(schoolName)) or is_curr_researcher_student:
         is_ivy_student = True
 
     return is_ivy_student
+
 
 def is_ivy_school(schoolName):
     """
@@ -38,7 +40,7 @@ def is_currently_student(profile):
     current_time = datetime.datetime.now()
     current_year = int(current_time.year)
     current_month = int(current_time.month)
-    schoolName = get_last_schoolname(profile)
+    # schoolName = get_last_schoolname(profile)
 
     if education:
         last_education = education[0]
@@ -65,6 +67,86 @@ def is_currently_student(profile):
     return is_curr_student
 
 
+def is_currently_student_new(profile):
+    """
+    Checks if the profile of the user is currently a student
+    *For RapidApi
+    """
+    is_curr_student = False
+    education = profile.get("educations", [])
+    current_time = datetime.datetime.now()
+    current_year = int(current_time.year)
+    current_month = int(current_time.month)
+
+    if education:
+        last_education = education[0]
+        
+        if "end" in last_education:
+            end_date = last_education["end"]
+            end_month = end_date.get("month", None)
+            end_year = end_date.get("year", None)
+
+            if end_year is not None or end_year != 0:
+                end_year = int(end_year)
+
+                if end_month is None or end_month == 0:
+                    if end_year >= current_year:
+                        is_curr_student = True
+
+                elif end_month is not None or end_month != 0:
+                    end_month = int(end_month)
+
+                    if end_year > current_year or (end_year == current_year and end_month >= current_month):
+                        is_curr_student = True
+
+    return is_curr_student
+
+
+def is_currently_researcher_student(profile):
+    """
+    Checks if the profile of the user is currently a researcher student- meaning its written
+    in their education
+    *For RapidApi
+    """
+    is_curr_research_student = False
+    is_curr_working = False
+    position = profile.get("position", [])
+    current_time = datetime.datetime.now()
+    current_year = int(current_time.year)
+    current_month = int(current_time.month)
+
+    if position:
+        last_position = position[0]
+        companyName = get_companyname(last_position)
+        title = get_position_title(last_position)
+        
+        if "end" in last_position:
+            end_date = last_position["end"]
+            end_month = end_date.get("month", None)
+            end_year = end_date.get("year", None)
+
+            if end_year is not None or end_year != 0:
+                end_year = int(end_year)
+
+                if end_month is None or end_month == 0:
+                    if end_year >= current_year:
+                        is_curr_working = True
+
+                elif end_month is not None or end_month != 0:
+                    end_month = int(end_month)
+
+                    if end_year > current_year or (end_year == current_year and end_month >= current_month):
+                        is_curr_working = True
+            
+            if end_year == 0:
+                is_curr_working = True
+        
+        if is_ivy_school(companyName) and is_title_student(title) and is_curr_working:
+            is_curr_research_student = True
+
+    return is_curr_research_student
+
+
 def get_last_schoolname(profile):
     """Returns the School Name of the Last School in the Education"""
 
@@ -75,12 +157,47 @@ def get_last_schoolname(profile):
         last_education = education[0]
 
         try:
-            # print(json.dumps(last_education, indent=2))
             schoolName = last_education["school"]["schoolName"]
         except KeyError:
             schoolName = last_education["schoolName"]
 
     return schoolName
+
+
+def get_last_schoolname_new(profile):
+    """Returns the School Name of the Last School in the Education
+    *Relevant for RapidApi"""
+
+    education = profile.get("educations", [])
+    schoolName = ""
+
+    if education != []:
+        last_education = education[0]
+        schoolName = last_education["schoolName"]
+
+    return schoolName
+
+
+def get_companyname(curr_position):
+    """Returns the Company Name of the Last Company in the Positions
+    *Relevant for RapidApi"""
+    return curr_position["companyName"]
+
+
+def get_position_title(curr_position):
+    """Returns the position title of the position
+    *Relevant for RapidApi"""
+    return curr_position["title"]
+
+
+def is_title_student(title):
+    """Checks if the title matches a title of a student researcher/Phd student etc.
+    *Relevant for RapidApi"""
+    keywords_list = ["student researcher", "phd student", "researcher", "doctoral student", "student"]
+    if any(keyword in title.lower() for keyword in keywords_list):
+        return True
+    else:
+        return False
 
 
 def get_education_names(profile):
@@ -124,10 +241,10 @@ def get_profile_last_name(profile):
     return last_name
 
 
-def get_profile_industry_name(profile):
-    """Returns the industry name of the profile user"""
-    industry_name = profile.get("industryName", "")
-    return industry_name
+# def get_profile_industry_name(profile):
+#     """Returns the industry name of the profile user"""
+#     industry_name = profile.get("industryName", "")
+#     return industry_name
 
 
 def get_profile_headline(profile):
@@ -151,14 +268,13 @@ def get_smallest_linkedin_photo_url(profile):
     return smallest_img_url
 
 
-def add_profile_to_database(profile_id, profile_url):
-    """ Adds a given profile_id to the data base according to the requried columns values
+def get_linkedin_photo_url(profile):
+    """ Gets the linkedin photo available (800*800) of the given profile
+    *Only relevant for the RapidApi
     """
-    # Connect to a database (or create a new one if it doesn't exist)
-    connection = sqlite3.connect('usersinfo.db')
-    cursor = connection.cursor()
-    
-    # cursor.execute('''
+    return profile.get("profilePicture", "")
+
+# cursor.execute('''
     #     CREATE TABLE UsersInfo (
     #     IndexID INTEGER PRIMARY KEY AUTOINCREMENT,
     #     ProfileID TEXT UNIQUE,
@@ -171,24 +287,42 @@ def add_profile_to_database(profile_id, profile_url):
     # );
     # ''')
 
-    # Authenticate using any Linkedin account credentials
-    api = Linkedin('phillipslola837@gmail.com', 'Lola3a4a77&')
-    # # GET a profile
-    profile = api.get_profile(profile_id)
+def add_profile_to_database(profile_id, profile_url):
+    """ Adds a given profile_id to the data base according to the requried columns values
+    """
+    # Connect to a database (or create a new one if it doesn't exist)
+    connection = sqlite3.connect('usersinfo.db')
+    cursor = connection.cursor()
+
+    # GitHub API for Linkedin
+    # api = Linkedin('phillipslola837@gmail.com', 'Lola3a4a77&')
+    # # # GET a profile
+    # profile = api.get_profile(profile_id)
+
+    #Rapid API for Linkedin
+    url = "https://linkedin-api8.p.rapidapi.com/"
+    querystring = {"username":profile_id}
+    headers = {
+        "X-RapidAPI-Key": "191e432bb6mshddc5b2894664670p1b5143jsn4e664d04e498",
+        "X-RapidAPI-Host": "linkedin-api8.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers, params=querystring)
+    profile = response.json()
     print("-------------------------------------------")
+    # print(json.dumps(profile, indent=2))
     first_name = get_profile_first_name(profile)
     print(f"First name: {first_name}")
     last_name = get_profile_last_name(profile)
     print(f"Last name: {last_name}")
-    where_curr_student = get_last_schoolname(profile)
+    where_curr_student = get_last_schoolname_new(profile)
     # print(f"Where is currently a student: {where_curr_student}")
-    education = get_last_schoolname(profile)
+    education = get_last_schoolname_new(profile)
     print(f"Education: {education}")
     is_curr_ivy_student = get_binary_value(is_ivy_student(profile))
     print(f"Is an ivy student now: {is_curr_ivy_student}")
-    is_curr_student = get_binary_value(is_currently_student(profile))
+    is_curr_student = get_binary_value(is_currently_student_new(profile))
     print(f"Is a student now: {is_curr_student}")
-    pic_url = get_smallest_linkedin_photo_url(profile)
+    pic_url = get_linkedin_photo_url(profile)
     # print(f"Picture url: {pic_url}")
     headline = get_profile_headline(profile)
     print(f"Headline: {headline}")
@@ -210,6 +344,8 @@ def add_profile_to_database(profile_id, profile_url):
             # Handle the case where the unique constraint is violated (ProfileID already exists)
             print(f"ProfileID '{profile_id}' already exists. Skipping insertion.")
             connection.rollback()
+    else:
+        print(f"------ProfileID '{profile_id}' isn't a current ivy student. Skipping insertion.")
 
     cursor.close()
     connection.close()
@@ -243,3 +379,5 @@ def is_profile_id_in_database(profile_id):
         cursor.close()
         connection.close()
 
+
+add_profile_to_database("luming-jason-chen-96763619b", "")

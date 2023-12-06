@@ -1,4 +1,4 @@
-from linkedin_api import Linkedin
+# from linkedin_api import Linkedin
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -123,7 +123,6 @@ def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
 
     # response = requests.get('https://app.zenserp.com/api/v2/search', headers=headers, params=params);
     
-
     # Check if the request was successful (status code 200)
     # if response.status_code == 200:
     #     # Parse the JSON content
@@ -179,19 +178,21 @@ def main():
         # # print(search_text)
         # result_list = get_new_connections(search_text)
         # print(result_list)
-        # user_info_dict = get_linkedin_profile_info('linkedin_urls_trialtwo.json')
-        user_info_dict = get_linkedin_profile_info('newdemojs.json')
+        user_info_dict = get_linkedin_profile_info('linkedin_urls_trialtwo.json')
+        # user_info_dict = get_linkedin_profile_info('newdemojs.json')
         # print(user_info_dict)
         print("Starting run")
         
         for profile_id, profile_url in user_info_dict.items():
             if not is_profile_id_in_database(profile_id):
+                print("****************************************")
                 print(f"Adding user: {profile_id}")
                 add_profile_to_database(profile_id, profile_url)
             else:
                 print(f"User: *{profile_id}* already exists in our database")
-        
-    # print('Finished Running')
+
+
+    print('Finished Running')
 
 
 if __name__ == "__main__":
