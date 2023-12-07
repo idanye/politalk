@@ -101,17 +101,21 @@ function createPopup() {
     {
       name: 'Lia Opperman',
       image: 'https://media.licdn.com/dms/image/D4E03AQGWrT4EHIcWeA/profile-displayphoto-shrink_100_100/0/1700504577540?e=1706745600&v=beta&t=bLXgZZ4b_taqHccpD-SHR-mrQ2UvnxclmhJM1pV-ExY', // Replace with actual image path or URL
-      description: 'Policy and Journalism Student at Princeton University'
+      description: 'Policy and Journalism Student at Princeton University',
+      profileLink: 'https://www.linkedin.com/in/lia-opperman-56545a176'
     },
     {
       name: 'Christina Sorochinsky',
       image: 'https://media.licdn.com/dms/image/C4D03AQFVq0B02xqunA/profile-displayphoto-shrink_100_100/0/1662696016084?e=1706745600&v=beta&t=KBrSAM4aJkUCGUrCglpPERvYp2YahLzCAe9qwgWxNSA',
-      description: 'Student at Harvard University'
+      description: 'Student at Harvard University',
+      profileLink: 'https://www.linkedin.com/in/christina-sorochinsky-12796324b'
+
     },
     {
       name: 'Lily Zamora',
       image: 'https://media.licdn.com/dms/image/C4E03AQFT3SJpwRxBDA/profile-displayphoto-shrink_100_100/0/1660240894014?e=1707350400&v=beta&t=cE7YSEZFLMjSqILIJSk7ZDM1wQgyuiU0LNVcMVQIBAY',
-      description: 'Student at Brown University'
+      description: 'Student at Brown University',
+      profileLink: 'https://www.linkedin.com/in/lily-zamora-679a9123a'
     }
   ];
   let currentIndex = 0;
@@ -147,9 +151,50 @@ function createPopup() {
     ? 'slideInFromRight 0.5s ease' 
     : 'slideInFromLeft 0.5s ease';
     popup.appendChild(card);
-  };
-  updateProfileCard(); // Initial profile card
+    
+    // 'Look Up' button
+    const lookupButton = document.createElement('button');
+    lookupButton.textContent = 'Look Up';
+    lookupButton.className = 'lookup-button';
+    lookupButton.onclick = () => {
+      window.open(profile.profileLink, '_blank');
+    };
+    card.appendChild(lookupButton);
 
+    // 'Contact' button
+    const contactButton = document.createElement('button');
+    contactButton.textContent = `Contact ${profile.name.split(' ')[0]}`; // Using first name for the button text
+    contactButton.className = 'contact-button';
+    contactButton.onclick = function(event) {
+      event.stopPropagation(); // Prevent the document click from closing the menu immediately
+      const dropdownMenu = this.nextElementSibling;
+      dropdownMenu.classList.toggle('show-dropdown');
+    };
+    card.appendChild(contactButton);
+    
+    // Dropdown Menu
+    const dropdownMenu = document.createElement('div');
+    dropdownMenu.className = 'dropdown-menu';
+
+    const directMessageOption = document.createElement('div');
+    directMessageOption.textContent = 'Send Direct Message';
+    directMessageOption.className = 'dropdown-option';
+    dropdownMenu.appendChild(directMessageOption);
+
+    const copyTemplateOption = document.createElement('div');
+    copyTemplateOption.textContent = 'Copy Template Message';
+    copyTemplateOption.className = 'dropdown-option';
+    dropdownMenu.appendChild(copyTemplateOption);
+
+    card.appendChild(dropdownMenu);
+
+    // Clearing the floats
+    const clearDiv = document.createElement('div');
+    clearDiv.className = 'clear-div';
+    card.appendChild(clearDiv);
+  };
+
+  updateProfileCard(); // Initial profile card
   // Create and add navigation arrows
   const prevArrow = document.createElement('img');
   prevArrow.src = chrome.runtime.getURL('images/prevArrow.svg');
@@ -179,7 +224,14 @@ function createPopup() {
   });
 }
 
-document.addEventListener('click', function(event) { // 'event' is now a parameter of the function
+document.addEventListener('click', function(event) {
+  // Close all dropdown menus if the clicked target is not part of a dropdown menu
+  document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+    if (!menu.contains(event.target) && !event.target.classList.contains('contact-button')) {
+      menu.classList.remove('show-dropdown');
+    }
+  });
+
   const popup = document.getElementById('politalk_popup');
   const extensionButton = document.querySelector('.extension_button');
   if (popup && !popup.contains(event.target) && !event.target.closest('.extension_button')) {
