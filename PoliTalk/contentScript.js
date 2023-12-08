@@ -64,7 +64,7 @@ function createLinkedInButton() {
     // Create the popup
     createPopup();
 
-    extensionButton.addEventListener('click', function() {
+    extensionButton.addEventListener('click', function () {
       this.classList.toggle('show-line');
       const popup = document.getElementById('politalk_popup');
       if (popup) {
@@ -100,26 +100,37 @@ function createPopup() {
   const exampleProfiles = [
     {
       name: 'Lia Opperman',
-      image: 'https://media.licdn.com/dms/image/D4E03AQGWrT4EHIcWeA/profile-displayphoto-shrink_100_100/0/1700504577540?e=1706745600&v=beta&t=bLXgZZ4b_taqHccpD-SHR-mrQ2UvnxclmhJM1pV-ExY', // Replace with actual image path or URL
+      image:
+        'https://media.licdn.com/dms/image/D4E03AQGWrT4EHIcWeA/profile-displayphoto-shrink_100_100/0/1700504577540?e=1706745600&v=beta&t=bLXgZZ4b_taqHccpD-SHR-mrQ2UvnxclmhJM1pV-ExY', // Replace with actual image path or URL
       description: 'Policy and Journalism Student at Princeton University',
-      profileLink: 'https://www.linkedin.com/in/lia-opperman-56545a176'
+      profileLink: 'https://www.linkedin.com/in/lia-opperman-56545a176',
     },
     {
       name: 'Christina Sorochinsky',
-      image: 'https://media.licdn.com/dms/image/C4D03AQFVq0B02xqunA/profile-displayphoto-shrink_100_100/0/1662696016084?e=1706745600&v=beta&t=KBrSAM4aJkUCGUrCglpPERvYp2YahLzCAe9qwgWxNSA',
+      image:
+        'https://media.licdn.com/dms/image/C4D03AQFVq0B02xqunA/profile-displayphoto-shrink_100_100/0/1662696016084?e=1706745600&v=beta&t=KBrSAM4aJkUCGUrCglpPERvYp2YahLzCAe9qwgWxNSA',
       description: 'Student at Harvard University',
-      profileLink: 'https://www.linkedin.com/in/christina-sorochinsky-12796324b'
-
+      profileLink:
+        'https://www.linkedin.com/in/christina-sorochinsky-12796324b',
     },
     {
       name: 'Lily Zamora',
-      image: 'https://media.licdn.com/dms/image/C4E03AQFT3SJpwRxBDA/profile-displayphoto-shrink_100_100/0/1660240894014?e=1707350400&v=beta&t=cE7YSEZFLMjSqILIJSk7ZDM1wQgyuiU0LNVcMVQIBAY',
+      image:
+        'https://media.licdn.com/dms/image/C4E03AQFT3SJpwRxBDA/profile-displayphoto-shrink_100_100/0/1660240894014?e=1707350400&v=beta&t=cE7YSEZFLMjSqILIJSk7ZDM1wQgyuiU0LNVcMVQIBAY',
       description: 'Student at Brown University',
-      profileLink: 'https://www.linkedin.com/in/lily-zamora-679a9123a'
-    }
+      profileLink: 'https://www.linkedin.com/in/lily-zamora-679a9123a',
+    },
   ];
   let currentIndex = 0;
 
+  const templateMessage = `Hi, \n My name is...`;
+  // Function to copy text to clipboard
+  const copyToClipboard = text => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Message copied to clipboard!"); // Alert or any other notification
+    });
+  };
+  
   // Update the card with the profile data
   let lastDirection = 'right';
   const updateProfileCard = () => {
@@ -129,61 +140,60 @@ function createPopup() {
 
     const profile = exampleProfiles[currentIndex];
 
+
     const card = document.createElement('div');
     card.className = 'card';
-  
+
     const img = document.createElement('img');
     img.src = profile.image;
     img.alt = profile.name;
     img.className = 'profile-image';
     card.appendChild(img);
-  
+
     const name = document.createElement('h3');
     name.textContent = profile.name;
     card.appendChild(name);
-  
+
     const description = document.createElement('p');
     description.textContent = profile.description;
     card.appendChild(description);
 
     // Set the animation based on the last direction
-    card.style.animation = lastDirection === 'right' 
-    ? 'slideInFromRight 0.5s ease' 
-    : 'slideInFromLeft 0.5s ease';
+    card.style.animation =
+      lastDirection === 'right'
+        ? 'slideInFromRight 0.5s ease'
+        : 'slideInFromLeft 0.5s ease';
     popup.appendChild(card);
-    
-    // 'Look Up' button
-    const lookupButton = document.createElement('button');
-    lookupButton.textContent = 'Look Up';
-    lookupButton.className = 'lookup-button';
-    lookupButton.onclick = () => {
-      window.open(profile.profileLink, '_blank');
-    };
-    card.appendChild(lookupButton);
+
+    // Extract the first name from the profile
+    const firstName = profile.name.split(' ')[0];
 
     // 'Contact' button
     const contactButton = document.createElement('button');
-    contactButton.textContent = `Contact ${profile.name.split(' ')[0]}`; // Using first name for the button text
+    contactButton.textContent = `Contact ${firstName}`; // Using first name for the button text
     contactButton.className = 'contact-button';
-    contactButton.onclick = function(event) {
+    contactButton.onclick = function (event) {
       event.stopPropagation(); // Prevent the document click from closing the menu immediately
-      const dropdownMenu = this.nextElementSibling;
-      dropdownMenu.classList.toggle('show-dropdown');
+      this.nextElementSibling.classList.toggle('show-dropdown');
     };
     card.appendChild(contactButton);
-    
+
     // Dropdown Menu
     const dropdownMenu = document.createElement('div');
     dropdownMenu.className = 'dropdown-menu';
 
-    const directMessageOption = document.createElement('div');
-    directMessageOption.textContent = 'Send Direct Message';
-    directMessageOption.className = 'dropdown-option';
-    dropdownMenu.appendChild(directMessageOption);
+    // View Profile option
+    const viewProfileOption = document.createElement('div');
+    viewProfileOption.textContent = 'View Profile';
+    viewProfileOption.className = 'dropdown-option';
+    viewProfileOption.onclick = () => window.open(profile.profileLink, '_blank');
+    dropdownMenu.appendChild(viewProfileOption);
 
+    // Copy Template Message option
     const copyTemplateOption = document.createElement('div');
     copyTemplateOption.textContent = 'Copy Template Message';
     copyTemplateOption.className = 'dropdown-option';
+    copyTemplateOption.onclick = () => copyToClipboard(templateMessage);
     dropdownMenu.appendChild(copyTemplateOption);
 
     card.appendChild(dropdownMenu);
@@ -201,7 +211,8 @@ function createPopup() {
   prevArrow.className = 'arrow left';
   prevArrow.onclick = () => {
     lastDirection = 'left';
-    currentIndex = (currentIndex - 1 + exampleProfiles.length) % exampleProfiles.length;
+    currentIndex =
+      (currentIndex - 1 + exampleProfiles.length) % exampleProfiles.length;
     updateProfileCard();
   };
 
@@ -216,25 +227,47 @@ function createPopup() {
 
   popup.appendChild(prevArrow);
   popup.appendChild(nextArrow);
+
+  popup.addEventListener('click', function (event) {
+    // Close any open dropdown menus when clicking inside the popup but outside the menus
+    const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+    dropdownMenus.forEach(function (menu) {
+      const contactButton = menu.previousElementSibling;
+      if (
+        !menu.contains(event.target) &&
+        !contactButton.contains(event.target)
+      ) {
+        menu.classList.remove('show-dropdown');
+      }
+    });
+
+    event.stopPropagation(); // Prevent clicks within the popup from closing it
+  });
   // Append the popup to the document body
   document.body.appendChild(popup);
 
-  popup.addEventListener('click', function(event) {
-  event.stopPropagation(); // Prevent clicks within the popup from closing it
+  popup.addEventListener('click', function (event) {
+    event.stopPropagation(); // Prevent clicks within the popup from closing it
   });
 }
 
-document.addEventListener('click', function(event) {
-  // Close all dropdown menus if the clicked target is not part of a dropdown menu
-  document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
-    if (!menu.contains(event.target) && !event.target.classList.contains('contact-button')) {
+document.addEventListener('click', function (event) {
+  // Close any open dropdown menus if the click is outside the menu
+  document.querySelectorAll('.dropdown-menu').forEach(function (menu) {
+    const contactButton = menu.previousElementSibling;
+    if (!menu.contains(event.target) && !contactButton.contains(event.target)) {
       menu.classList.remove('show-dropdown');
     }
   });
 
+  // Handle clicks outside the popup
   const popup = document.getElementById('politalk_popup');
   const extensionButton = document.querySelector('.extension_button');
-  if (popup && !popup.contains(event.target) && !event.target.closest('.extension_button')) {
+  if (
+    popup &&
+    !popup.contains(event.target) &&
+    !event.target.closest('.extension_button')
+  ) {
     popup.classList.remove('show-popup');
     extensionButton.classList.remove('show-line');
   }
@@ -251,4 +284,3 @@ const observer = new MutationObserver(function (mutations) {
 
 observer.observe(document.body, { childList: true, subtree: true });
 injectCSS(makeButtonVisible);
-
