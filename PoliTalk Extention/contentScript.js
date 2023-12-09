@@ -125,7 +125,7 @@ function createPopup() {
   ];
   let currentIndex = 0;
 
-  const templateMessage = `Hi, \n My name is...`;
+  const templateMessage = `Hi, \n My name is...`; //Created a python function for this
   // Function to copy text to clipboard
   const copyToClipboard = text => {
     navigator.clipboard.writeText(text).then(() => {

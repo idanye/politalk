@@ -379,7 +379,7 @@ def is_profile_id_in_database(profile_id):
 def generate_war_discussion_message(sender_firstname, recipient_firstname, recipient_studytile, recipient_schoolname):
     """Generates a message for a student to initiate a discussion about the war in Israel."""
     message = f"Hi {recipient_firstname},\n\n"
-    message += f"I hope this message finds you well. My name is {sender_firstname}, and I'm a {recipient_studytile} at {recipient_schoolname} interested in discussing current events, particularly the situation in Israel."
+    message += f"I hope this message finds you well. My name is {sender_firstname}, and I'm a {recipient_studytile} at {recipient_schoolname} in Israel interested in discussing current events, particularly the situation in Israel."
     message += "\n\nI understand that this is a sensitive and complex topic, and I want to approach it with respect and empathy. If you're comfortable, I'd appreciate the opportunity to share perspectives and thoughts on the matter."
     message += "\n\nOf course, if you prefer not to engage in such discussions or if now is not the right time, I completely understand. Feel free to let me know your comfort level, and I respect your boundaries."
     message += "\n\nThank you for considering this, and I'm here if you'd like to chat about it or any other topic regarding this matter as well."
