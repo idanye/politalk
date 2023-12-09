@@ -30,7 +30,9 @@ function createLinkedInButton() {
   if (document.querySelector('.extension_button')) {
     return; // If the button exists, exit the function
   }
+  
   const navItems = document.querySelector('#global-nav > div > nav > ul');
+
   if (navItems) {
     const extensionButton = document.createElement('li');
     extensionButton.className = 'extension_button';

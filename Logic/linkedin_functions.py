@@ -1,5 +1,5 @@
 # from linkedin_api import Linkedin
-from uniLists import ivy_league_uni
+from uniLists import ivy_league_uni_expanded
 import requests
 import json
 import datetime
@@ -24,7 +24,7 @@ def is_ivy_school(schoolName):
     """
     Checks if the school name of the user is an ivy league
     """
-    for ivy_school in ivy_league_uni:
+    for ivy_school in ivy_league_uni_expanded:
         if schoolName in ivy_school or schoolName == ivy_school:
             return True
         else:
@@ -221,7 +221,7 @@ def is_prev_ivy_student(profile):
 
     study_at_ivy = False
     education_schools_names = get_uni_names(profile)
-    common_schools = set(get_uni_names) & set(ivy_league_uni)
+    common_schools = set(get_uni_names) & set(ivy_league_uni_expanded)
 
     if common_schools:
         study_at_ivy = True
@@ -362,10 +362,6 @@ def is_profile_id_in_database(profile_id):
         cursor.execute("SELECT ProfileID FROM UsersInfo WHERE ProfileID = ?", (profile_id,))
         result = cursor.fetchone()  # Fetch the first result
 
-        # # Print the query and result for debugging
-        # print(f"Executed SQL query: SELECT ProfileID FROM UsersInfo WHERE ProfileID = {profile_id}")
-        # print(f"Result from the database: {result}")
-
         # If result is not None, the profile_id is in the database
         if result is None:
             return False
@@ -380,4 +376,15 @@ def is_profile_id_in_database(profile_id):
         connection.close()
 
 
-add_profile_to_database("luming-jason-chen-96763619b", "")
+def generate_war_discussion_message(sender_firstname, recipient_firstname, recipient_studytile, recipient_schoolname):
+    """Generates a message for a student to initiate a discussion about the war in Israel."""
+    message = f"Hi {recipient_firstname},\n\n"
+    message += f"I hope this message finds you well. My name is {sender_firstname}, and I'm a {recipient_studytile} at {recipient_schoolname} interested in discussing current events, particularly the situation in Israel."
+    message += "\n\nI understand that this is a sensitive and complex topic, and I want to approach it with respect and empathy. If you're comfortable, I'd appreciate the opportunity to share perspectives and thoughts on the matter."
+    message += "\n\nOf course, if you prefer not to engage in such discussions or if now is not the right time, I completely understand. Feel free to let me know your comfort level, and I respect your boundaries."
+    message += "\n\nThank you for considering this, and I'm here if you'd like to chat about it or any other topic regarding this matter as well."
+    
+    return message
+
+
+# add_profile_to_database("luming-jason-chen-96763619b", "")

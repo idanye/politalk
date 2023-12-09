@@ -74,7 +74,7 @@ def get_search_text_from_url(profile_url):
         print("Search query not found in the URL.")
 
 
-def get_new_connections(search_text, output_file="linkedin_urls_trialtwo.json"):
+def get_new_connections(search_text, output_file="linkedin_urls_trialnoname.json"):
     """Recieves the search text and returns a set of the linkedin urls 
     from the search and saves it as a text file
     """
@@ -172,15 +172,15 @@ def main():
     print("Preparing")
 
     # Testing out: 
-    for ivy_uni in ivy_league_uni[:1]:
-        # url = get_search_text_url(school_name=ivy_uni)
-        # search_text = get_search_text_from_url(url)
-        # # print(search_text)
-        # result_list = get_new_connections(search_text)
-        # print(result_list)
-        user_info_dict = get_linkedin_profile_info('linkedin_urls_trialtwo.json')
+    for ivy_uni in ivy_league_uni[1:2]:
+        url = get_search_text_url(school_name=ivy_uni)
+        search_text = get_search_text_from_url(url)
+        print(f"Printing search text: \n{search_text}")
+        result_list = get_new_connections(search_text, "linkedin_urls_trialthree.json")
+        print(f"Printing result list: \n{result_list}")
+        user_info_dict = get_linkedin_profile_info('linkedin_urls_trialthree.json')
         # user_info_dict = get_linkedin_profile_info('newdemojs.json')
-        # print(user_info_dict)
+        print(f"Printing user info dict: \n{user_info_dict}")
         print("Starting run")
         
         for profile_id, profile_url in user_info_dict.items():
@@ -190,7 +190,6 @@ def main():
                 add_profile_to_database(profile_id, profile_url)
             else:
                 print(f"User: *{profile_id}* already exists in our database")
-
 
     print('Finished Running')
 

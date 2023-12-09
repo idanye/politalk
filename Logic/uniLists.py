@@ -1,5 +1,5 @@
 
-ivy_league_uni = [
+ivy_league_uni_expanded = [
     "Brown University",
     "Brown University School of Public Health",
     "Brown University School of Engineering",
@@ -18,6 +18,17 @@ ivy_league_uni = [
     "Cornell University College of Veterinary Medicine",
     "Cornell University - College of Arts and Sciences",
     "Cornell University - College of Human Ecology",
+    "Dartmouth College",
+    "Harvard University",
+    "University of Pennsylvania",
+    "Princeton University",
+    "Yale University"
+]
+
+ivy_league_uni = [
+    "Brown University",
+    "Columbia University",
+    "Cornell University",
     "Dartmouth College",
     "Harvard University",
     "University of Pennsylvania",
