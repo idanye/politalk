@@ -4,7 +4,7 @@ from flask import jsonify
 from flask_cors import CORS
 from flask import request
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'politalk1948'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///usersinfo.db'
 db = SQLAlchemy(app)
@@ -17,7 +17,7 @@ class User(db.Model):
 
 @app.route('/')
 def home():
-    return 'Welcome to the Admin Dashboard!'
+    return render_template('admin_dashboard.html')
 
 @app.route('/users', methods=['GET'])
 def get_users():
