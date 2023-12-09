@@ -17,14 +17,14 @@
     "48": "images/talk_48.png",
     "128": "images/talk_128.png"
   },
-  "web_accessible_resources": [
-    "popup_style.css",
-    "extensionButton.css",
-    "images/PoliTalk.png",
-    "images/PoliTalkHover.png",
-    "images/prevArrow.svg",
-    "images/nextArrow.svg"
-  ],
+  "web_accessible_resources": 
+    [ "popup_style.css",
+      "extensionButton.css",
+      "images/PoliTalk.png",
+      "images/PoliTalkHover.png",
+      "images/prevArrow.svg",
+      "images/nextArrow.svg" 
+    ],
   "content_scripts": [
     {
       "matches": ["https://www.linkedin.com/*"],
