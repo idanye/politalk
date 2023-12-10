@@ -97,6 +97,7 @@
 
 .politalk_popup .card {
   background-color: #f9f9f9;
+  position: relative;
   padding: 15px;
   border-radius: 5px;
   text-align: center;
@@ -151,6 +152,7 @@
 }
 
 .contact-button {
+  position: relative;
   padding: 5px 10px;
   border: 1px solid #333;
   background-color: #f9f9f9;
@@ -166,14 +168,16 @@
 .dropdown-menu {
   display: none;
   position: absolute;
-  right: -30%; /* Positions the dropdown to the right of the button */
   border: 1px solid #ddd;
   background-color: #f9f9f9;
   min-width: 150px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 5px 8px 20px 5px rgba(0,0,0,0.2);
   z-index: 2;
   border-radius: 4px;
   font-size: 12px; /* Adjusted font size */
+  position: absolute;
+  width: 100%; /* Match width to the contact button */
+  top: 95%; /* Position it at the bottom of the contact button */
 }
 
 
