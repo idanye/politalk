@@ -1,7 +1,7 @@
 
 chrome.runtime.onInstalled.addListener(function () {
     // Set up OAuth client ID obtained from the Google Cloud Console
-    const clientId = 'YOUR_CLIENT_ID'; //Need to change
+    const clientId = '244937241479-cfaum7l8to9koib2mqra7nobmfm89f2c.apps.googleusercontent.com'; 
     const scopes = ['openid', 'email', 'profile'];
   
     // Add an event listener for the browser action
