@@ -1,16 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
-const ejs = require('ejs');
+const path = require('path');
 const app = express();
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('Server'));
-app.set('view engine', 'ejs');
 
-// Connect to existing SQLite database
-const db = new sqlite3.Database('../database/usersinfo.db');
+// Connect to the existing SQLite database
+const db = new sqlite3.Database('./database/usersinfo.db');
 
 // Routes (example route)
 app.get('/', (req, res) => {
@@ -21,7 +20,7 @@ app.get('/', (req, res) => {
       res.status(500).send('Internal Server Error');
     } else {
       // Render the admin dashboard view with user data
-      res.render('admin_dashboard', { users });
+      res.sendFile(__dirname + '/admin_dashboard.html');
     }
   });
 });
