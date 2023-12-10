@@ -10,4 +10,4 @@ venv/
 tempCodeRunnerFile.py
 chrome*
 node_modules
-usersinfo.db
+# usersinfo.db
