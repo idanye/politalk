@@ -291,7 +291,7 @@ def add_profile_to_database(profile_id, profile_url):
     """ Adds a given profile_id to the data base according to the requried columns values
     """
     # Connect to a database (or create a new one if it doesn't exist)
-    connection = sqlite3.connect('usersinfo.db')
+    connection = sqlite3.connect('../Server/database/usersinfo.db')
     cursor = connection.cursor()
 
     # GitHub API for Linkedin
@@ -355,7 +355,7 @@ def add_profile_to_database(profile_id, profile_url):
 def is_profile_id_in_database(profile_id):
     try:
         # Connect to the SQLite database
-        connection = sqlite3.connect('usersinfo.db')
+        connection = sqlite3.connect('Server\database\usersinfo.db')
         cursor = connection.cursor()
 
         # Execute a SELECT query to check if the profile_id is in the database
