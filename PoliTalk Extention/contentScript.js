@@ -67,24 +67,23 @@ function createLinkedInButton() {
     // Style the button and icon
     addHoverEffect(extensionButton, icon);
 
-    extensionButton.addEventListener('click', function () {
+    extensionButton.addEventListener('click', async function () {
       this.classList.toggle('show-line');
       let popup = document.getElementById('politalk_popup');
       // Create the popup if it doesn't exist
       if (!popup) {
         createPopup();
+        popup = document.getElementById('politalk_popup'); //assign the new popup
       }
-      else {
-        if (!popup.classList.contains('show-popup')) {
-          const rect = this.getBoundingClientRect();
-          popup.style.top = `${rect.bottom}px`;
-          popup.style.left = `${rect.left}px`;
-          if (!fetchedStudents) {
-            fetchRandomStudents();
-          }
-        }
-        popup.classList.toggle('show-popup');
+      const rect = this.getBoundingClientRect();
+      popup.style.top = `${rect.bottom}px`;
+      popup.style.left = `${rect.left}px`;
+
+      if (!fetchedStudents) {
+        await fetchRandomStudents();
       }
+      updateProfileCard();
+      popup.classList.toggle('show-popup');
     });
     navItems.insertBefore(extensionButton, navItems.firstChild);
   }
@@ -241,9 +240,6 @@ async function fetchRandomStudents() {
     if (data && data.data) {
       fetchedStudents = data.data;
       currentIndex = 0;
-      if (document.getElementById('politalk_popup')) {
-        updateProfileCard();
-      }
     }
   } catch (error) {
     console.error('Error fetching random students:', error);
