@@ -3,13 +3,18 @@
 
 <head>
     <title>Admin Dashboard</title>
-    <link type="text/css" href="/server_admin.css">
+    <link rel="stylesheet" type="text/css" href="admin.css">
 </head>
 
 <body>
+    <div id="clickLimitSetting">
+        <h2>Set Daily Click Limit</h2>
+        <input type="number" id="dailyClickLimitInput" placeholder="Enter daily click limit" />
+        <button onclick="updateDailyClickLimit()">Update Limit</button>
+    </div>
     <h1>Admin Dashboard</h1>
     <div id="userList"></div>
-    <script type="text/javascript" src="/server_admin.js"></script>
+    <script src="admin.js"></script>
 </body>
 
 </html>
