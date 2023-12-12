@@ -3,7 +3,11 @@
   "name": "PoliTalk",
   "version": "2.0",
   "description": "Suggests contacts to start a conversation with on LinkedIn",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "identity"],
+  "oauth2": {
+    "client_id": "244418011805-r4v6ab104idurlsioqopbqi53g7iorln.apps.googleusercontent.com",
+    "scopes": ["https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -25,7 +29,8 @@
         "images/PoliTalk.png",
         "images/PoliTalkHover.png",
         "images/prevArrow.svg",
-        "images/nextArrow.svg"
+        "images/nextArrow.svg",
+        "images/PoliTalk-logo-normal.svg"
       ],
       "matches": ["<all_urls>"]
     }

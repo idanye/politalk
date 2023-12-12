@@ -1,116 +1,70 @@
-document.addEventListener('DOMContentLoaded', function () {
-  loadContacts();
-  document
-    .getElementById('refreshButton')
-    .addEventListener('click', loadContacts);
+// popup.js
+const loginButton = document.getElementById('google-login-btn');
+const loginSection = document.getElementById('login-section');
+
+// Check if the user is already authenticated
+chrome.identity.getAuthToken({ 'interactive': false }, function(token) {
+    if (token) {
+        // User is already authenticated; fetch user profile
+        fetchUserProfile(token, loginSection);
+    }
 });
 
-function loadContacts() {
-  var contactList = document.getElementById('contactList');
-  contactList.innerHTML = ''; // Clear existing contacts
-  var contacts = [
-    "Alice Johnson",
-    "Bob Smith",
-    "Charlie Davis",
-    "Diana Reed",
-    "Ethan Hall",
-    "Fiona Clarke",
-    "George Wright",
-    "Hannah Scott",
-    "Isaac Phillips",
-    "Jack Roberts",
-    "Katie Green",
-    "Liam Edwards",
-    "Mia Lewis",
-    "Nathan Wood",
-    "Olivia Harris",
-    "Ran Zaaroor",
-    "Sophie King"
-  ]; // Your dummy contacts
+loginButton.addEventListener('click', function() {
+    handleGoogleLogin(loginSection);
+});
 
-  // Get three random contacts
-  var randomContacts = getRandomContacts(contacts, 3);
-
-  randomContacts.forEach(function (contact, index) {
-    var div = document.createElement('div');
-    div.className = 'contact-box';
-
-    // Create contact button
-    var button = document.createElement('button');
-    button.className = 'contact-button';
-    button.textContent = contact;
-    button.onclick = function (event) {
-      toggleDropdown(event, index);
-    };
-    div.appendChild(button);
-    contactList.appendChild(div);
-
-    // Create dropdown content
-    var dropdownContent = document.createElement('div');
-    dropdownContent.id = 'dropdown-' + index;
-    dropdownContent.className = 'dropdown-content';
-    var lookupLink = document.createElement('a');
-    lookupLink.href = '#';
-    lookupLink.textContent = 'Look up';
-    lookupLink.addEventListener('click', function() {
-      var searchQuery = contact.split(' ').join('%20'); // Replace spaces with URL-encoded spaces
-      var linkedInSearchUrl = `https://www.linkedin.com/search/results/all/?keywords=${searchQuery}`;
-      window.open(linkedInSearchUrl, '_blank'); // Open LinkedIn search in a new tab
+function handleGoogleLogin(loginSection) {
+    chrome.identity.getAuthToken({ 'interactive': true }, function(token) {
+        if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError);
+            alert("Error logging into Google. Please try again.");
+            // Handle errors here
+        } else if (token) {
+            fetchUserProfile(token, loginSection);
+        }
     });
-    dropdownContent.appendChild(lookupLink);
-
-    var messageLink = document.createElement('a');
-    messageLink.href = '#';
-    messageLink.textContent = 'Generate message';
-    // Add event listener for 'Send Message' functionality
-    // Implement logic to generate a built-in message
-    dropdownContent.appendChild(messageLink);
-
-    document.body.appendChild(dropdownContent); // Append dropdowns directly to body
-  });
 }
 
-function toggleDropdown(event, index) {
-  // Close all open dropdowns first
-  var dropdowns = document.getElementsByClassName('dropdown-content');
-  for (let i = 0; i < dropdowns.length; i++) {
-    if (i !== index) {
-      // Exclude the current dropdown
-      dropdowns[i].classList.remove('show');
-    }
-  }
-  var dropdown = document.getElementById('dropdown-' + index);
-  var buttonRect = event.target.getBoundingClientRect();
-  dropdown.style.left = buttonRect.right + 'px'; // Position to the right of the button
-  dropdown.style.top = buttonRect.top + 'px'; // Align to the top of the button
-  dropdown.classList.toggle('show');
+function fetchUserProfile(token, loginSection) {
+    fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
+    .then((response) => response.json())
+    .then((userinfo) => {
+        console.log("Fetched user info:", userinfo);
+        updateUserInterface(userinfo, loginSection);
+    })
+    .catch((error) => {
+        console.error(error);
+        // Handle fetch errors here
+    });
 }
 
-// returns an array of num random contacts from the contacts array 
-function getRandomContacts(contacts, num) {
-  var randomContacts = [];
-  var usedIndices = new Set(); // To keep track of used indices
+function updateUserInterface(userinfo, loginSection) {
+    // Add PoliTalk logo at the top
+    const logo = document.createElement('img');
+    logo.src = 'path_to_politalk_logo.png'; // Path to your PoliTalk logo image
+    logo.style.width = '100px'; // Adjust size as needed
+    logo.style.display = 'block';
+    logo.style.margin = '0 auto'; // Center the logo
+    loginSection.innerHTML = ''; // Clear the previous content
+    loginSection.appendChild(logo);
 
-  while(randomContacts.length < num) {
-    var randomIndex = Math.floor(Math.random() * contacts.length);
-    if (!usedIndices.has(randomIndex)) {
-      randomContacts.push(contacts[randomIndex]);
-      usedIndices.add(randomIndex);
-    }
-  }
+    // Add text message
+    const loginMessage = document.createElement('p');
+    loginMessage.textContent = "Logged into Google successfully. Waiting for admin approval...";
+    loginSection.appendChild(loginMessage);
 
-  return randomContacts;
+    // Add Google profile picture
+    const userImage = document.createElement('img');
+    userImage.src = userinfo.picture; // Google profile picture
+    userImage.style.borderRadius = '50%'; // Make it circular
+    userImage.style.width = '50px'; // Set image size
+    userImage.style.position = 'absolute';
+    userImage.style.bottom = '10px';
+    userImage.style.right = '10px';
+    loginSection.appendChild(userImage);
 }
-
-// Close the dropdown if the user clicks outside of it
-window.onclick = function (event) {
-  if (!event.target.matches('.contact-button')) {
-    var dropdowns = document.getElementsByClassName('dropdown-content');
-    for (let i = 0; i < dropdowns.length; i++) {
-      let openDropdown = dropdowns[i];
-      if (openDropdown.classList.contains('show')) {
-        openDropdown.classList.remove('show');
-      }
-    }
-  }
-};

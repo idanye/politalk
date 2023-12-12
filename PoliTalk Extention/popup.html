@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="popup_style.css" />
-    <script src="popup.js"></script>
-  </head>
-  <body>
-    <h2>Start PoliTalking with:</h2>
-    <div id="contactList"></div>
-    <button id="refreshButton">Refresh Contacts</button>
-  </body>
+<head>
+    <title>PoliTalk Login</title>
+    <link rel="stylesheet" type="text/css" href="popup.css">
+</head>
+<body>
+    <div class="popup-container">
+        <img src="images/PoliTalk-logo-normal.svg" alt="PoliTalk Logo" class="extension-logo"> <!-- Add your logo image here -->
+        <h2>Login with Google to start PoliTalking:</h2> <!-- Changed to h2 for prominence -->
+        <button id="google-login-btn">Login with Google</button>
+    </div>
+</body>
+<script src="auth.js"></script>
+<script src="popup.js"></script>
 </html>
