@@ -6,11 +6,16 @@
 </head>
 <body>
     <div class="popup-container">
-        <img src="images/PoliTalk-logo-normal.svg" alt="PoliTalk Logo" class="extension-logo"> <!-- Add your logo image here -->
-        <h2>Login with Google to start PoliTalking:</h2> <!-- Changed to h2 for prominence -->
-        <button id="google-login-btn">Login with Google</button>
+        <div class="logo-container">
+            <img src="images/PoliTalk-logo-normal.svg" alt="PoliTalk Logo" class="extension-logo">
+        </div>
+        <div id="loading-section" class="content-section">
+            <div id="loading-indicator" class="loader"></div>
+        </div>
+        <div id="content" class="content-section" style="display: none;">
+            <!-- Dynamic content will be loaded here -->
+        </div>
     </div>
+    <script src="popup.js"></script>
 </body>
-<script src="auth.js"></script>
-<script src="popup.js"></script>
 </html>

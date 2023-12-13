@@ -2,6 +2,24 @@ let fetchedStudents = null;
 let currentIndex = 0;
 let lastDirection = 'right';
 
+// Check login status and show/hide the button accordingly
+function updateButtonVisibility() {
+    chrome.runtime.sendMessage({ action: "checkLoginStatus" }, function (response) {
+        if (response.isLoggedIn) {
+            makeButtonVisible();
+        } else {
+            hideButton();
+        }
+    });
+}
+
+function hideButton() {
+    const extensionButton = document.querySelector('.extension_button');
+    if (extensionButton) {
+        extensionButton.style.display = 'none';
+    }
+}
+
 function injectCSS(callback) {
   const link = document.createElement('link');
   link.href = chrome.runtime.getURL('extensionButton.css');
@@ -10,6 +28,7 @@ function injectCSS(callback) {
   link.onload = callback;
   document.head.appendChild(link);
 }
+
 
 function makeButtonVisible() {
   const extensionButton = document.querySelector('.extension_button');
@@ -40,7 +59,7 @@ function createLinkedInButton() {
   if (navItems) {
     const extensionButton = document.createElement('li');
     extensionButton.className = 'extension_button';
-    extensionButton.style.visibility = 'hidden';
+    updateButtonVisibility();
 
     // Create a container for the icon and text
     const iconContainer = document.createElement('div');

@@ -1,23 +1,22 @@
-chrome.runtime.onInstalled.addListener(function () {
-  // Set up OAuth client ID obtained from the Google Cloud Console
-  const clientId =
-    '244937241479-cfaum7l8to9koib2mqra7nobmfm89f2c.apps.googleusercontent.com';
-  const scopes = ['openid', 'email', 'profile'];
+let isLoggedIn = false;  // Tracks login status
 
-  // Add an event listener for the browser action
-  chrome.browserAction.onClicked.addListener(function () {
-    // Use chrome.identity to authenticate user
-    chrome.identity.getAuthToken(
-      { interactive: true, scopes: scopes },
-      function (token) {
-        if (chrome.runtime.lastError) {
-          console.error(chrome.runtime.lastError);
-          return;
-        }
+// Function to check the login status
+function checkLogin(callback) {
+    chrome.identity.getAuthToken({ 'interactive': false }, function (token) {
+        isLoggedIn = !!token;
+        callback(isLoggedIn);
+    });
+}
 
-        // Use the token to make authenticated requests
-        console.log('Authentication successful. Token:', token);
-      }
-    );
-  });
+// Listen for messages from content scripts
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.action === "checkLoginStatus") {
+        checkLogin(function (loggedIn) {
+            sendResponse({ isLoggedIn: loggedIn });
+        });
+        return true; // Indicates asynchronous response
+    } else if (request.action === "updateLoginStatus") {
+        // Update the login status based on user actions in popup
+        isLoggedIn = request.isLoggedIn;
+    }
 });

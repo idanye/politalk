@@ -1,70 +1,147 @@
 // popup.js
-const loginButton = document.getElementById('google-login-btn');
-const loginSection = document.getElementById('login-section');
+const popupContainer = document.querySelector('.popup-container');
 
-// Check if the user is already authenticated
-chrome.identity.getAuthToken({ 'interactive': false }, function(token) {
-    if (token) {
-        // User is already authenticated; fetch user profile
-        fetchUserProfile(token, loginSection);
-    }
-});
+function showLoadingSection() {
+    document.getElementById('loading-section').style.display = 'block';
+    document.getElementById('content').style.display = 'none';
+}
 
-loginButton.addEventListener('click', function() {
-    handleGoogleLogin(loginSection);
-});
+function hideLoadingSection() {
+    document.getElementById('loading-section').style.display = 'none';
+}
 
-function handleGoogleLogin(loginSection) {
+function showContent() {
+    document.getElementById('content').style.display = 'block';
+}
+
+function clearPopupContent() {
+    const contentDiv = document.getElementById('content');
+    contentDiv.innerHTML = '';
+}
+
+function showLoggedOutUI() {
+    clearPopupContent(); // Clear the popup content
+    hideLoadingSection();
+    showContent();
+    const contentDiv = document.getElementById('content');
+    const loginMessage = document.createElement('h2');
+    loginMessage.textContent = 'Login with Google to start PoliTalking:';
+    contentDiv.appendChild(loginMessage);
+
+    const loginButton = document.createElement('button');
+    loginButton.id = 'google-login-btn';
+    loginButton.className = 'google-login-btn'; // Add a class for styling
+
+    // Create an image element for the Google logo
+    const googleLogo = document.createElement('img');
+    googleLogo.src = 'https://www.svgrepo.com/show/475656/google-color.svg';
+    googleLogo.alt = 'Google logo';
+    googleLogo.className = 'google-logo'; // Add a class for styling
+
+    // Append the Google logo and text to the button
+    loginButton.appendChild(googleLogo);
+    loginButton.appendChild(document.createTextNode(' Login with Google'));
+
+    contentDiv.appendChild(loginButton);
+
+    loginButton.addEventListener('click', handleGoogleLogin);
+
+    document.getElementById('google-login-btn').addEventListener('click', function() {
+        handleGoogleLogin(popupContainer);
+    });
+}
+
+function showLoggedInUI(userinfo) {
+    hideLoadingSection();
+    showContent();
+    const contentDiv = document.getElementById('content');
+    contentDiv.innerHTML = '';
+    const loginMessage = document.createElement('p');
+    loginMessage.textContent = "You're logged into your Google Account.";
+    contentDiv.appendChild(loginMessage);
+
+    // User profile image
+    const userImage = document.createElement('img');
+    userImage.src = userinfo.picture;
+    userImage.className = 'user-profile-image'; // Added class for styling
+    contentDiv.appendChild(userImage);
+
+    // Logout button
+    const logoutButton = document.createElement('button');
+    logoutButton.id = 'logout-button';
+    logoutButton.textContent = 'Logout';
+    contentDiv.appendChild(logoutButton);
+
+    // Attach event listener to logout button
+    logoutButton.addEventListener('click', handleLogout);
+}
+
+function handleGoogleLogin(popupContainer) {
     chrome.identity.getAuthToken({ 'interactive': true }, function(token) {
         if (chrome.runtime.lastError) {
             console.error(chrome.runtime.lastError);
             alert("Error logging into Google. Please try again.");
-            // Handle errors here
         } else if (token) {
-            fetchUserProfile(token, loginSection);
+            fetchUserProfile(token);
         }
     });
 }
 
-function fetchUserProfile(token, loginSection) {
-    fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    })
-    .then((response) => response.json())
-    .then((userinfo) => {
-        console.log("Fetched user info:", userinfo);
-        updateUserInterface(userinfo, loginSection);
-    })
-    .catch((error) => {
+async function fetchUserProfile(token) {
+    try {
+        const response = await fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const userinfo = await response.json();
+        console.log("Fetched user info:", userinfo); // Check user info
+        chrome.storage.local.set({isLoggedIn: true}, function() {
+            console.log("User is marked as logged in.");
+            showLoggedInUI(userinfo); // Ensure this is called
+            chrome.runtime.sendMessage({ action: "updateLoginStatus", isLoggedIn: true });
+        });
+    } catch (error) {
         console.error(error);
-        // Handle fetch errors here
+        alert("Failed to fetch user profile.");
+        showLoggedOutUI();
+        chrome.runtime.sendMessage({ action: "updateLoginStatus", isLoggedIn: false });
+    }
+}
+
+function handleLogout() {
+    chrome.identity.getAuthToken({ 'interactive': false }, function(token) {
+        if (token) {
+            // Remove the cached token
+            chrome.identity.removeCachedAuthToken({ 'token': token }, function() {
+                // Clear user data from local storage or other storage mechanisms
+                chrome.storage.local.remove(['userinfo', 'isLoggedIn'], function() {
+                    console.log("User is marked as logged out. User info and login status cleared.");
+                    // Update the UI to show the logged-out state
+                    showLoggedOutUI();
+                    chrome.runtime.sendMessage({ action: "updateLoginStatus", isLoggedIn: false });
+                });
+            });
+        } else {
+            // In case there's no token, still clear the user data and update UI
+            chrome.storage.local.remove(['userinfo', 'isLoggedIn'], function() {
+                showLoggedOutUI();
+            });
+        }
     });
 }
 
-function updateUserInterface(userinfo, loginSection) {
-    // Add PoliTalk logo at the top
-    const logo = document.createElement('img');
-    logo.src = 'path_to_politalk_logo.png'; // Path to your PoliTalk logo image
-    logo.style.width = '100px'; // Adjust size as needed
-    logo.style.display = 'block';
-    logo.style.margin = '0 auto'; // Center the logo
-    loginSection.innerHTML = ''; // Clear the previous content
-    loginSection.appendChild(logo);
-
-    // Add text message
-    const loginMessage = document.createElement('p');
-    loginMessage.textContent = "Logged into Google successfully. Waiting for admin approval...";
-    loginSection.appendChild(loginMessage);
-
-    // Add Google profile picture
-    const userImage = document.createElement('img');
-    userImage.src = userinfo.picture; // Google profile picture
-    userImage.style.borderRadius = '50%'; // Make it circular
-    userImage.style.width = '50px'; // Set image size
-    userImage.style.position = 'absolute';
-    userImage.style.bottom = '10px';
-    userImage.style.right = '10px';
-    loginSection.appendChild(userImage);
-}
+document.addEventListener('DOMContentLoaded', function() {
+    showLoadingSection();
+    chrome.storage.local.get(['isLoggedIn'], function(result) {
+        if (result.isLoggedIn) {
+            chrome.identity.getAuthToken({ 'interactive': false }, function(token) {
+                if (token) {
+                    fetchUserProfile(token);
+                } else {
+                    showLoggedOutUI();
+                }
+            });
+        } else {
+            showLoggedOutUI();
+        }
+    });
+});
