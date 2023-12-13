@@ -11,7 +11,7 @@ app.listen(port, () => {
 
 // Set Up SQLite Database Connection
 const sqlite3 = require('sqlite3').verbose();
-const dbPath = '../../Server/database/usersinfo.db';  // Adjust this path as needed
+const dbPath = '../../database/usersinfo.db';  // Adjust this path as needed
 const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     console.error(err.message);
