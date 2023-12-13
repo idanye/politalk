@@ -5,7 +5,7 @@
   "description": "Suggests contacts to start a conversation with on LinkedIn",
   "permissions": ["activeTab", "storage", "identity"],
   "oauth2": {
-    "client_id": "244418011805-r4v6ab104idurlsioqopbqi53g7iorln.apps.googleusercontent.com",
+    "client_id": "244418011805-tduq6s41q47p9nvsjjq07l24345ntkh1.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
   },
   "action": {

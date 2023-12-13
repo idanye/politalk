@@ -4,15 +4,22 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    fetch('/login', {
+    fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ username, password })
     })
-    .then(response => response.text())
-    .then(data => alert(data))
+    .then(response => {
+        if (response.ok) {
+            // Hide the login container and show the dashboard container
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboardContainer').style.display = 'block';
+        } else {
+            throw new Error('Login failed');
+        }
+    })
     .catch(error => console.error('Error:', error));
 });
 

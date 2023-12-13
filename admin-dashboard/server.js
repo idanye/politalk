@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 });
 
 // Basic user list for demonstration
-const users = [{ username: "adminreich", passwordHash: "$2y$10$" }];
+const users = [{ username: "adminreich", passwordHash: "2b$10$15z1NibFcggLc0R7WUtr5OmJedlKlJavcPNjRQjd2vG0QKYvhAGVa" }];
 
 app.post('/login', async (req, res) => {
     const user = users.find(u => u.username === req.body.username);
