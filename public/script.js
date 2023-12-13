@@ -3,14 +3,28 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function fetchUsers() {
-    // Mock data - replace with API call
+    // Here, make an API call to fetch users
+    // Mock data
     const users = [
-        { id: 1, email: 'user1@example.com', isApproved: false },
-        { id: 2, email: 'user2@example.com', isApproved: true },
-        // Add more mock users or fetch from your API
+        { id: 1, email: 'pendinguser@example.com', isApproved: false },
+        { id: 2,
+            email: 'approveduser@example.com',
+            fullName: 'Jane Doe',
+            isApproved: true,
+            linkedInContacts: [
+                { name: 'John Smith', url: 'https://www.linkedin.com/in/john-smith/' },
+                { name: 'Emily White', url: 'https://www.linkedin.com/in/emily-white/' }
+            ]
+        },
+            // ...
     ];
 
-    const contentDiv = document.getElementById('dashboardContent');
+    displayPendingUsers(users.filter(user => !user.isApproved));
+    displayApprovedUsers(users.filter(user => user.isApproved));
+}
+
+function displayPendingUsers(users) {
+    const section = document.getElementById('pendingUsersSection');
     let html = '<table><tr><th>Email</th><th>Status</th><th>Actions</th></tr>';
 
     users.forEach(user => {
@@ -27,12 +41,45 @@ function fetchUsers() {
     });
 
     html += '</table>';
-    contentDiv.innerHTML = html;
+    section.innerHTML = html;
+}
+
+function displayApprovedUsers(users) {
+    const section = document.getElementById('approvedUsersSection');
+    let html = '<table><tr><th>Email</th><th>Full Name</th><th>Status</th><th>LinkedIn Contacts Contacted</th></tr>';
+
+    users.forEach(user => {
+        // Generate HTML for LinkedIn contacts
+        let linkedInContactsHtml = user.linkedInContacts.map(contact => {
+            // Assuming each contact has a 'name' and 'url' property
+            return `<a href="${contact.url}" target="_blank">${contact.name}</a>`;
+        }).join('<br>'); // Separate contacts with a line break
+
+        html += `
+            <tr>
+                <td>${user.email}</td>
+                <td>${user.fullName}</td>
+                <td>${user.isApproved ? 'Approved' : 'Pending'}</td>
+                <td>${linkedInContactsHtml}</td>
+            </tr>
+        `;
+    });
+
+    html += '</table>';
+    section.innerHTML = html;
+}
+
+
+function showPendingUsers() {
+    document.getElementById('pendingUsersSection').style.display = 'block';
+    document.getElementById('approvedUsersSection').style.display = 'none';
+}
+
+function showApprovedUsers() {
+    document.getElementById('pendingUsersSection').style.display = 'none';
+    document.getElementById('approvedUsersSection').style.display = 'block';
 }
 
 function updateUserStatus(userId, isApproved) {
-    console.log(`Updating user ${userId} to ${isApproved}`);
-    // Here you would make an API call to update the user status
-    // After updating, you might want to re-fetch the user list:
-    // fetchUsers();
+    // ... update user status logic
 }
