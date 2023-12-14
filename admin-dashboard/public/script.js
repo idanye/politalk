@@ -4,7 +4,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    fetch('http://localhost:3000/login', {
+    fetch('http://localhost:3001/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -12,20 +12,71 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         body: JSON.stringify({ username, password })
     })
     .then(response => {
-        if (response.ok) {
-            // Hide the login container and show the dashboard container
+        if (!response.ok) {
+            if (response.status === 401) {
+                // If the status code is 401, it's an incorrect username or password
+                throw new Error('Incorrect username or password');
+            } 
+            return response.text().then(text => { throw new Error(text) });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.token) {
+            localStorage.setItem('userToken', data.token);
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('dashboardContainer').style.display = 'block';
-        } else {
-            throw new Error('Login failed');
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        alert(error.message); // Show the error message
+        window.location.reload()
+    });
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetchUsers();
+    const token = localStorage.getItem('userToken');
+    
+    // Check if token exists
+    if (token) {
+        // If token exists, verify it with the server
+        fetch('http://localhost:3001/dashboardData', {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Session invalid');
+            }
+            return response.json(); // Assuming dashboard data is returned
+        })
+        .then(data => {
+            // Handle dashboard data
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboardContainer').style.display = 'block';
+            fetchUsers(); // Fetch users now that we're logged in
+            // Process and display the dashboard data as needed
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            localStorage.removeItem('userToken');
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('dashboardContainer').style.display = 'none';
+            // Optionally, redirect to the login page or show a login form
+        });
+    } else {
+        // If no token, show the login form
+        document.getElementById('loginContainer').style.display = 'block';
+        document.getElementById('dashboardContainer').style.display = 'none';
+    }
 });
+
+function logout() {
+    localStorage.removeItem('userToken');
+    // Redirect to login page or show login form
+}
 
 function fetchUsers() {
     // Here, make an API call to fetch users

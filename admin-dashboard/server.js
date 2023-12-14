@@ -2,6 +2,8 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const app = express();
 const path = require('path');
+const jwt = require('jsonwebtoken');
+const port = 3001;
 
 app.use(express.json()); // For parsing application/json
 app.use(express.static('public')); // Serve static files from 'public' directory
@@ -20,26 +22,27 @@ app.post('/login', async (req, res) => {
     }
     try {
         if (await bcrypt.compare(req.body.password, user.passwordHash)) {
-            res.send('Success');
+            const token = jwt.sign({ username: user.username }, 'yourSecretKey', { expiresIn: '1h' });
+            res.json({ token }); // Send token as JSON
         } else {
-            res.send('Not Allowed');
+            res.status(401).send('Login failed');
         }
     } catch {
-        res.status(500).send();
+        res.status(500).json({ message: 'Error during login process' });
     }
 });
 
-app.listen(3000, () => {
-    console.log('Server started on http://localhost:3000');
+
+app.get('/dashboardData', (req, res) => {
+    const token = req.headers.authorization.split(' ')[1]; // Assuming format "Bearer token"    
+    jwt.verify(token, 'yourSecretKey', (err, user) => {
+        if (err) {
+            return res.status(403).send('Invalid token');
+        }
+        res.json({ message: "Dashboard data or user info" });
+    });
 });
 
-async function hashPassword(password) {
-    const saltRounds = 10; // It's common to use 10 rounds
-    try {
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-        return hashedPassword;
-    } catch (error) {
-        console.error(error);
-        throw new Error('Password hashing failed');
-    }
-}
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+    });
