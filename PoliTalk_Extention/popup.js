@@ -118,7 +118,7 @@ async function fetchUserProfile(token) {
             console.log("User is marked as logged in and UUID is stored.");
             showLoggedInUI(userinfo); // Ensure this is called
             chrome.runtime.sendMessage({ action: "updateLoginStatus", isLoggedIn: true });
-            setTimeout(updateButtonVisibility, 500);
+            updateButtonVisibility();
         });
 
     } catch (error) {
