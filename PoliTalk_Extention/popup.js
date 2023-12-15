@@ -45,10 +45,6 @@ function showLoggedOutUI() {
     contentDiv.appendChild(loginButton);
 
     loginButton.addEventListener('click', handleGoogleLogin);
-
-    document.getElementById('google-login-btn').addEventListener('click', function() {
-        handleGoogleLogin(popupContainer);
-    });
 }
 
 function showLoggedInUI(userinfo) {
@@ -94,13 +90,37 @@ async function fetchUserProfile(token) {
         });
         const userinfo = await response.json();
         console.log("Fetched user info:", userinfo); // Check user info
+
+        // Prepare user data for the server
+        const userData = {
+            UUID: userinfo.id,
+            Email: userinfo.email,
+            FullName: userinfo.name,
+            isGoogleVerified: userinfo.verified_email ? 1 : 0,
+            isAdminVerified: 0
+        };
+
+
+        // Send user data to your server
+        fetch('http://localhost:3000/api/add-extension-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(serverResponse => serverResponse.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error sending data to server:', error));
+
+        // Set local storage and update UI
         chrome.storage.local.set({isLoggedIn: true}, function() {
             console.log("User is marked as logged in.");
             showLoggedInUI(userinfo); // Ensure this is called
             chrome.runtime.sendMessage({ action: "updateLoginStatus", isLoggedIn: true });
         });
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching user profile:', error);
         alert("Failed to fetch user profile.");
         showLoggedOutUI();
         chrome.runtime.sendMessage({ action: "updateLoginStatus", isLoggedIn: false });

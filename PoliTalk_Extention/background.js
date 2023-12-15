@@ -1,3 +1,5 @@
+//background.js
+
 let isLoggedIn = false;  // Tracks login status
 
 // Function to check the login status
