@@ -2,16 +2,21 @@ let fetchedStudents = null;
 let currentIndex = 0;
 let lastDirection = 'right';
 
-// Check login status and show/hide the button accordingly
-function updateButtonVisibility() {
-    chrome.runtime.sendMessage({ action: "checkLoginStatus" }, function (response) {
-        if (response.isLoggedIn) {
-            makeButtonVisible();
-        } else {
-            hideButton();
-        }
-    });
+async function updateButtonVisibility() {
+  chrome.runtime.sendMessage({ action: "checkLoginStatus" }, async function(response) {
+      if (response.isLoggedIn) {
+          const isAdminApproved = await fetchUserApprovalStatus();
+          if (isAdminApproved) {
+              makeButtonVisible();
+          } else {
+              hideButton();
+          }
+      } else {
+          hideButton();
+      }
+  });
 }
+
 
 function hideButton() {
     const extensionButton = document.querySelector('.extension_button');
@@ -32,8 +37,9 @@ function injectCSS(callback) {
 
 function makeButtonVisible() {
   const extensionButton = document.querySelector('.extension_button');
+
   if (extensionButton) {
-    extensionButton.style.visibility = 'visible';
+    extensionButton.style.display = 'block';
   }
 }
 
@@ -265,6 +271,25 @@ async function fetchRandomStudents() {
   }
 }
 
+async function fetchUserApprovalStatus() {
+  return new Promise((resolve, reject) => {
+      chrome.storage.local.get(['UUID'], async function(result) {
+          if (result.UUID) {
+              try {
+                  const response = await fetch(`http://localhost:3000/api/check-user-approval/${result.UUID}`);
+                  const data = await response.json();
+                  resolve(data.isAdminApproved);
+              } catch (error) {
+                  console.error('Error fetching user approval status:', error);
+                  resolve(false);
+              }
+          } else {
+              resolve(false);
+          }
+      });
+  });
+}
+
 document.addEventListener('click', function (event) {
   // Close any open dropdown menus if the click is outside the menu
   document.querySelectorAll('.dropdown-menu').forEach(function (menu) {
@@ -287,6 +312,17 @@ document.addEventListener('click', function (event) {
   }
 });
 
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+  if (message.action === "loginStatusChanged") {
+      updateButtonVisibility();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  updateButtonVisibility(); // Call this when the page loads
+});
+
+
 const observer = new MutationObserver(function (mutations) {
   mutations.forEach(function (mutation) {
     if (document.querySelector('#global-nav > div > nav > ul')) {
@@ -298,3 +334,4 @@ const observer = new MutationObserver(function (mutations) {
 
 observer.observe(document.body, { childList: true, subtree: true });
 injectCSS(makeButtonVisible);
+

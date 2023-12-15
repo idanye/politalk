@@ -72,7 +72,7 @@ function showLoggedInUI(userinfo) {
     logoutButton.addEventListener('click', handleLogout);
 }
 
-function handleGoogleLogin(popupContainer) {
+function handleGoogleLogin() {
     chrome.identity.getAuthToken({ 'interactive': true }, function(token) {
         if (chrome.runtime.lastError) {
             console.error(chrome.runtime.lastError);
@@ -97,7 +97,7 @@ async function fetchUserProfile(token) {
             Email: userinfo.email,
             FullName: userinfo.name,
             isGoogleVerified: userinfo.verified_email ? 1 : 0,
-            isAdminVerified: 0
+            isAdminApproved: 0
         };
 
 
@@ -114,11 +114,13 @@ async function fetchUserProfile(token) {
         .catch(error => console.error('Error sending data to server:', error));
 
         // Set local storage and update UI
-        chrome.storage.local.set({isLoggedIn: true}, function() {
-            console.log("User is marked as logged in.");
+        chrome.storage.local.set({ isLoggedIn: true, UUID: userinfo.id }, function() {
+            console.log("User is marked as logged in and UUID is stored.");
             showLoggedInUI(userinfo); // Ensure this is called
             chrome.runtime.sendMessage({ action: "updateLoginStatus", isLoggedIn: true });
+            setTimeout(updateButtonVisibility, 500);
         });
+
     } catch (error) {
         console.error('Error fetching user profile:', error);
         alert("Failed to fetch user profile.");
@@ -133,11 +135,12 @@ function handleLogout() {
             // Remove the cached token
             chrome.identity.removeCachedAuthToken({ 'token': token }, function() {
                 // Clear user data from local storage or other storage mechanisms
-                chrome.storage.local.remove(['userinfo', 'isLoggedIn'], function() {
+                chrome.storage.local.remove(['UUID','userinfo', 'isLoggedIn'], function() {
                     console.log("User is marked as logged out. User info and login status cleared.");
                     // Update the UI to show the logged-out state
                     showLoggedOutUI();
                     chrome.runtime.sendMessage({ action: "updateLoginStatus", isLoggedIn: false });
+                    updateButtonVisibility();
                 });
             });
         } else {

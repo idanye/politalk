@@ -1,5 +1,7 @@
 /* Styles for the extension button */
 .extension_button {
+  margin-top: 6px;
+  display: none;
   cursor: pointer;
   display: flex;
   align-items: center;

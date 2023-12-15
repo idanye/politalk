@@ -1,12 +1,21 @@
-//background.js
+// background.js
 
-let isLoggedIn = false;  // Tracks login status
+let isLoggedIn = false;
 
 // Function to check the login status
 function checkLogin(callback) {
     chrome.identity.getAuthToken({ 'interactive': false }, function (token) {
         isLoggedIn = !!token;
         callback(isLoggedIn);
+    });
+}
+
+// Send a message to content scripts when the login status changes
+function notifyContentScripts() {
+    chrome.tabs.query({}, function(tabs) {
+        for (let tab of tabs) {
+            chrome.tabs.sendMessage(tab.id, { action: "loginStatusChanged", isLoggedIn: isLoggedIn });
+        }
     });
 }
 
@@ -18,7 +27,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         });
         return true; // Indicates asynchronous response
     } else if (request.action === "updateLoginStatus") {
-        // Update the login status based on user actions in popup
         isLoggedIn = request.isLoggedIn;
+        notifyContentScripts();
     }
 });

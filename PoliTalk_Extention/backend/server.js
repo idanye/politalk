@@ -71,7 +71,7 @@ const exUsersDB = new sqlite3.Database('../../database/extensionUsers.db', (err)
 // Endpoint to handle user data from Google login
 app.post('/api/add-extension-user', (req, res) => {
   console.log(req.body);
-  const { UUID, Email, FullName, isGoogleVerified, isAdminVerified } = req.body;
+  const { UUID, Email, FullName, isGoogleVerified, isAdminApproved } = req.body;
   
   // Check if the user already exists
   exUsersDB.get("SELECT * FROM extensionUsers WHERE UUID = ?", [UUID], (err, row) => {
@@ -82,8 +82,8 @@ app.post('/api/add-extension-user', (req, res) => {
 
       // If the user doesn't exist, insert new record
       if (!row) {
-          const insertQuery = `INSERT INTO extensionUsers (UUID, Email, FullName, isGoogleVerified, isAdminVerified) VALUES (?, ?, ?, ?, ?)`;
-          exUsersDB.run(insertQuery, [UUID, Email, FullName, isGoogleVerified, isAdminVerified], (err) => {
+          const insertQuery = `INSERT INTO extensionUsers (UUID, Email, FullName, isGoogleVerified, isAdminApproved) VALUES (?, ?, ?, ?, ?)`;
+          exUsersDB.run(insertQuery, [UUID, Email, FullName, isGoogleVerified, isAdminApproved], (err) => {
               if (err) {
                   res.status(500).send({ error: err.message });
                   return;
@@ -93,6 +93,23 @@ app.post('/api/add-extension-user', (req, res) => {
       } else {
           // User already exists
           res.send({ message: 'User already exists' });
+      }
+  });
+});
+
+// Endpoint to check if user is admin approved
+app.get('/api/check-user-approval/:UUID', (req, res) => {
+  const UUID = req.params.UUID;
+
+  exUsersDB.get("SELECT isAdminApproved FROM extensionUsers WHERE UUID = ?", [UUID], (err, row) => {
+      if (err) {
+          res.status(500).send({ error: err.message });
+          return;
+      }
+      if (row && row.isAdminApproved === 1) {
+          res.send({ isAdminApproved: true });
+      } else {
+          res.send({ isAdminApproved: false });
       }
   });
 });
