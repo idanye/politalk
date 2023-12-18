@@ -14,7 +14,8 @@ let db = new sqlite3.Database('../../database/extensionUsers.db', (err) => {
             Email TEXT,
             FullName TEXT,
             isGoogleVerified INTEGER,
-            isAdminApproved INTEGER
+            isAdminApproved INTEGER,
+            linkedInUsersContacted TEXT
         )`, (err) => {
             if (err) {
                 // Table already created
