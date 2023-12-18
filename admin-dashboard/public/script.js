@@ -86,7 +86,7 @@ function fetchUsers() {
     // Here, make an API call to fetch users
     // Mock data
     const users = [
-        { id: 1, email: 'pendinguser@example.com', isApproved: false },
+        { id: 1, email: 'pendinguser@example.com', isApproved: false, linkedInContacts: []},
         { id: 2,
             email: 'approveduser@example.com',
             fullName: 'Jane Doe',
@@ -96,7 +96,13 @@ function fetchUsers() {
                 { name: 'Emily White', url: 'https://www.linkedin.com/in/emily-white/' }
             ]
         },
-            // ...
+        {
+            id: 3,
+            email: 'user1@example.com',
+            fullName: 'User user',
+            isApproved: false,
+            linkedInContacts: []
+        },
     ];
 
     displayPendingUsers(users.filter(user => !user.isApproved));
@@ -176,8 +182,13 @@ function updateUserStatus(userId, isApproved) {
         return response.json();
     })
     .then(data => {
-        alert('User status updated successfully');
-        // Optionally, refresh the list of users
+        if (isApproved) {
+            alert('User status updated successfully');
+            moveUserToApproved(userId);
+        } else {
+            alert('User has been rejected');
+            removeUserFromPending(userId);
+        }
         fetchUsers();
     })
     .catch(error => {
@@ -186,3 +197,23 @@ function updateUserStatus(userId, isApproved) {
     });
 }
 
+function moveUserToApproved(userId) {
+    // Find the user in the pending list and move them to the approved list
+    // This would involve manipulating the DOM elements
+    // Example:
+    let userRow = document.getElementById('pendingUser_' + userId);
+    document.getElementById('approvedUsersSection').appendChild(userRow);
+
+    // // Refresh or update both sections as needed
+    // fetchUsers();
+}
+
+function removeUserFromPending(userId) {
+    // Remove the user row from the pending list
+    // Example:
+    let userRow = document.getElementById('pendingUser_' + userId);
+    userRow.remove();
+
+    // // Refresh or update the section as needed
+    // fetchUsers();
+}

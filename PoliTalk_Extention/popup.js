@@ -97,7 +97,7 @@ async function fetchUserProfile(token) {
             Email: userinfo.email,
             FullName: userinfo.name,
             isGoogleVerified: userinfo.verified_email ? 1 : 0,
-            isAdminApproved: 0
+            isAdminApproved: 1
         };
 
 

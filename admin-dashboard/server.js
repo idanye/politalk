@@ -53,9 +53,13 @@ app.post('/updateUserStatus', (req, res) => {
     const { userId, isApproved } = req.body;
 
     // Logic to update user status in your database
+
     // For example, you might have a function like this:
     // updateUserStatusInDatabase(userId, isApproved)
+    
     // This is a placeholder. Replace it with your actual database update logic.
+    // Update the user's status in your database
+    // Example: db.updateUserStatus(userId, isApproved)
 
     // Assuming the update is successful
     res.status(200).json({ message: 'User status updated successfully' });
