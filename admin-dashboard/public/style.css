@@ -9,6 +9,7 @@ body, html {
 }
 
 #loginContainer {
+    display: none;
     text-align: center;
     margin-top: 5%;
 }

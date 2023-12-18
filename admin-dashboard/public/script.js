@@ -31,16 +31,21 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     .catch(error => {
         console.error('Error:', error);
         alert(error.message); // Show the error message
-        window.location.reload()
+
+        if (error.message.includes('Failed to fetch')) {
+            alert('Unable to connect to the server. Please try again later.');
+        } else {
+            alert(error.message);
+        }
+        // window.location.reload()
     });
 });
 
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('userToken');
-    
-    // Check if token exists
+
     if (token) {
-        // If token exists, verify it with the server
+        // Verify the token with the server
         fetch('http://localhost:3001/dashboardData', {
             headers: {
                 'Authorization': 'Bearer ' + token
@@ -50,28 +55,27 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) {
                 throw new Error('Session invalid');
             }
-            return response.json(); // Assuming dashboard data is returned
+            return response.json();
         })
         .then(data => {
-            // Handle dashboard data
-            document.getElementById('loginContainer').style.display = 'none';
+            // Token is valid - show dashboard and hide login
             document.getElementById('dashboardContainer').style.display = 'block';
-            fetchUsers(); // Fetch users now that we're logged in
-            // Process and display the dashboard data as needed
+            document.getElementById('loginContainer').style.display = 'none';
+            fetchUsers();  // Assuming this function fetches and displays dashboard data
         })
         .catch(error => {
             console.error('Error:', error);
             localStorage.removeItem('userToken');
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('dashboardContainer').style.display = 'none';
-            // Optionally, redirect to the login page or show a login form
         });
     } else {
-        // If no token, show the login form
+        // No token or token invalid - show login form
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('dashboardContainer').style.display = 'none';
     }
 });
+
 
 function logout() {
     localStorage.removeItem('userToken');
@@ -157,5 +161,28 @@ function showApprovedUsers() {
 }
 
 function updateUserStatus(userId, isApproved) {
-    // ... update user status logic
+    fetch('http://localhost:3001/updateUserStatus', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('userToken') // Include the auth token if needed
+        },
+        body: JSON.stringify({ userId, isApproved })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to update user status');
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert('User status updated successfully');
+        // Optionally, refresh the list of users
+        fetchUsers();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating user status');
+    });
 }
+

@@ -1,14 +1,11 @@
 # Ignore compiled Python files
 __pycache__/
-
 # Ignore the virtual environment folder
 venv/
-
 # Ignore the log files
 *.log
-
 tempCodeRunnerFile.py
 chrome*
 node_modules
-# usersinfo.db
 App_GUI
+# usersinfo.db
