@@ -47,8 +47,6 @@
 > Current Features:
 
 ## Acknowledgments
-> (Mention any mentors, contributors, or third-party resources that helped you)
-> 
 > David Kalamanson
 > 
 > Reichman University
