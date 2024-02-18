@@ -8,4 +8,5 @@ tempCodeRunnerFile.py
 chrome*
 node_modules
 App_GUI
-# usersinfo.db
+usersinfo.db
+.env
