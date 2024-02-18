@@ -9,4 +9,4 @@ chrome*
 node_modules
 App_GUI
 usersinfo.db
-.env
+*.env
